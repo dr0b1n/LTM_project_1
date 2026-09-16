@@ -1,0 +1,74 @@
+{
+  "dataset_id": "synthetic-vendor-contract-v2",
+  "document": "synthetic_vendor_contract_v2.pdf",
+  "document_id": "SYN-VSA-002",
+  "disclaimer": "Synthetic, illustrative, non-production data. Findings are expected test outcomes, not legal advice.",
+  "expected_findings": [
+    {
+      "policy_id": "POL-001",
+      "title": "Encryption at Rest",
+      "expected_status": "COMPLIANT",
+      "expected_page": 2,
+      "expected_heading": "2.2 Encryption at Rest",
+      "expected_evidence": "The Vendor shall encrypt all Customer Data stored within Vendor-managed systems using AES-256 encryption or an equivalent industry-standard encryption method.",
+      "reason": "The clause explicitly satisfies the stated encryption-at-rest requirement.",
+      "requires_human_review": false
+    },
+    {
+      "policy_id": "POL-002",
+      "title": "Breach Notification",
+      "expected_status": "NON_COMPLIANT",
+      "expected_page": 3,
+      "expected_heading": "3.2 Notification Commitment",
+      "expected_evidence": "The Vendor shall notify the Customer of a confirmed security incident within thirty calendar days after completing its internal investigation.",
+      "reason": "Thirty calendar days after investigation is longer and less definite than the required 72-hour deadline.",
+      "requires_human_review": true
+    },
+    {
+      "policy_id": "POL-003",
+      "title": "Audit Rights",
+      "expected_status": "MISSING",
+      "expected_page": null,
+      "expected_heading": null,
+      "expected_evidence": null,
+      "reason": "No clause grants the Customer audit, inspection, or independent-assurance access rights.",
+      "requires_human_review": true
+    },
+    {
+      "policy_id": "POL-004",
+      "title": "Data Retention",
+      "expected_status": "AMBIGUOUS",
+      "expected_page": 4,
+      "expected_heading": "4.1 Data Retention",
+      "expected_evidence": "The Vendor may retain Customer Data for a reasonable period following termination where necessary for operational, legal, backup, or dispute-resolution purposes.",
+      "reason": "The phrase reasonable period does not provide a measurable duration or objective deletion trigger.",
+      "requires_human_review": true
+    },
+    {
+      "policy_id": "POL-005",
+      "title": "Subprocessor Notification",
+      "expected_status": "REVIEW_REQUIRED",
+      "expected_pages": [
+        5,
+        5
+      ],
+      "expected_headings": [
+        "5.2 General Notice",
+        "5.3 Urgent Appointment"
+      ],
+      "expected_evidence": [
+        "The Vendor will publish an updated list of material subprocessors through its customer portal and will provide at least thirty days prior notice before appointing a new material subprocessor.",
+        "Notwithstanding Section 5.2, the Vendor may appoint a replacement subprocessor without prior notice when the Vendor determines that an urgent operational or security need exists. Notice will be provided when reasonably practicable after the appointment."
+      ],
+      "reason": "The general prior-notice commitment conflicts with an exception allowing appointment before notice. Both clauses require human review.",
+      "requires_human_review": true
+    }
+  ],
+  "pii_test_values": {
+    "PERSON": "Alex Morgan",
+    "EMAIL_ADDRESS": "alex.morgan@example.test",
+    "PHONE_NUMBER": "+1 202-555-0147",
+    "IP_ADDRESS": "192.0.2.25"
+  },
+  "evaluation_note": "Ground truth is stored only in this file and is not present in the contract text."
+}

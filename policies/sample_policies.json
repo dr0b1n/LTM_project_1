@@ -1,0 +1,55 @@
+{
+  "policy_set_id": "vendor-baseline-v1",
+  "policies": [
+    {
+      "policy_id": "POL-001",
+      "title": "Encryption at Rest",
+      "category": "Information Security",
+      "requirement": "Vendor must encrypt stored customer data using AES-256 or an accepted equivalent.",
+      "severity": "HIGH",
+      "expected_commitment": "An explicit AES-256 or equivalent encryption-at-rest commitment.",
+      "remediation_guidance": "Add an explicit encryption-at-rest commitment using AES-256 or an approved equivalent.",
+      "policy_version": "v1"
+    },
+    {
+      "policy_id": "POL-002",
+      "title": "Breach Notification",
+      "category": "Incident Management",
+      "requirement": "Vendor must notify the customer of a confirmed security incident within 72 hours.",
+      "severity": "HIGH",
+      "expected_commitment": "A notification deadline no longer than 72 hours after confirmation.",
+      "remediation_guidance": "Amend the notification deadline to 72 hours or less after confirmation.",
+      "policy_version": "v1"
+    },
+    {
+      "policy_id": "POL-003",
+      "title": "Audit Rights",
+      "category": "Governance",
+      "requirement": "Customer must have contractual rights to audit or inspect the vendor security controls.",
+      "severity": "MEDIUM",
+      "expected_commitment": "An explicit customer audit, inspection, or independent-assurance access right.",
+      "remediation_guidance": "Add a proportionate audit and inspection rights clause.",
+      "policy_version": "v1"
+    },
+    {
+      "policy_id": "POL-004",
+      "title": "Data Retention",
+      "category": "Data Governance",
+      "requirement": "The contract must define a specific retention period or objective deletion trigger after termination.",
+      "severity": "MEDIUM",
+      "expected_commitment": "A measurable retention period or clearly defined deletion event.",
+      "remediation_guidance": "Define a specific retention period and deletion timeline.",
+      "policy_version": "v1"
+    },
+    {
+      "policy_id": "POL-005",
+      "title": "Subprocessor Notification",
+      "category": "Third-Party Management",
+      "requirement": "Vendor must provide prior notice before appointing a new material subprocessor, without an exception that permits appointment before notice.",
+      "severity": "MEDIUM",
+      "expected_commitment": "Prior notification in all material-subprocessor appointment scenarios.",
+      "remediation_guidance": "Remove or narrow the urgent appointment exception and require prompt prior notice or customer approval.",
+      "policy_version": "v1"
+    }
+  ]
+}

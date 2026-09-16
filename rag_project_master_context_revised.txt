@@ -1,0 +1,963 @@
+RAG-POWERED VENDOR COMPLIANCE AUDITOR
+MASTER PROJECT CONTEXT FOR FUTURE AI PROMPTS
+
+HOW TO USE THIS FILE
+Copy this entire file into a new AI conversation before asking for help. Then add a specific request such as:
+- "Using this project context, create the folder structure and starter code."
+- "Using this context, implement the contract ingestion module."
+- "Review this project design and identify missing production controls."
+- "Generate tests for the Presidio redaction pipeline."
+
+
+============================================================
+0. DEMONSTRATION SCOPE OVERRIDE - READ THIS FIRST
+============================================================
+PROJECT INTENT:
+This is a small, local demonstration project whose purpose is to show that the selected technologies can be connected into a working RAG workflow. It is not production software, not a production pilot, and not intended to produce legally authoritative compliance decisions.
+
+PRIMARY SUCCESS CRITERION:
+The end-to-end workflow works reliably enough for a short demonstration. Showing the implementation and integration of the technologies is more important than maximizing retrieval accuracy, classification accuracy, model quality, scalability, visual polish, or production readiness.
+
+TIME CONSTRAINTS:
+- The project must be completed within approximately one month.
+- The developer can work approximately 4 hours per day in total.
+- During the same month, the developer is also completing one similar individual project and one group project.
+- Therefore, target approximately 24 to 30 focused hours for this project.
+- Treat 36 hours as the absolute maximum for this project.
+- Prefer roughly 8 focused sessions of about 4 hours each, with one optional contingency session.
+
+MANDATORY SCOPE RULE FOR FUTURE AI ASSISTANTS:
+Always propose the smallest, simplest implementation that visibly demonstrates the required technology. Do not generate production architecture, enterprise hardening, broad abstractions, extensive test suites, complex design patterns, or optional infrastructure unless the user explicitly requests them.
+
+DEMO TARGET:
+The minimum working demonstration should:
+1. Use a simple Streamlit interface.
+2. Accept one text-based synthetic PDF or offer a bundled synthetic sample.
+3. Extract text with basic page metadata.
+4. Redact a small set of PII types with Presidio and spaCy.
+5. Perform simple paragraph-based or fixed-size chunking.
+6. Generate local embeddings with granite-embedding:30m through Ollama.
+7. Store and retrieve sanitized chunks with ChromaDB.
+8. Compare retrieved evidence against only 3 to 5 simple sample policies.
+9. Use a local Ollama language model to return a structured finding.
+10. Validate the finding with a small Pydantic schema.
+11. Display status, evidence, page, explanation, and recommendation in Streamlit.
+12. Optionally save a simple result to JSON or SQLite if time remains.
+
+ACCURACY AND EVALUATION INTENT:
+- Accuracy optimization is not the objective of this project.
+- Do not spend significant time tuning chunk sizes, retrieval thresholds, prompts, rankings, confidence calibration, or model parameters.
+- A small synthetic dataset with predictable examples is sufficient.
+- Include examples that demonstrate compliant, non-compliant, ambiguous, and missing outcomes where practical.
+- Basic manual verification and a few focused tests are sufficient.
+- Do not introduce Ragas or a large evaluation framework unless explicitly requested.
+- Clearly document that results are illustrative and may be inaccurate.
+
+FRONTEND PRIORITY:
+The frontend is the immediate priority because a review is approaching. Build a review-ready Streamlit interface first using deterministic mock data. Keep the mock-data boundary simple so it can later be replaced by the real local processing pipeline.
+
+PREFERRED IMPLEMENTATION STYLE:
+- Use straightforward Python modules and functions.
+- Keep the folder structure compact.
+- Avoid premature abstractions, dependency injection frameworks, repositories, factories, plugin systems, background queues, and microservices.
+- FastAPI is optional unless it is necessary to demonstrate the technology or is explicitly required by the reviewer.
+- Prefer direct local function calls from Streamlit for the smallest demo.
+- Support PDF only. Add DOCX or TXT only if the core workflow is already complete and time remains.
+- Prefer JSON persistence over SQLite if persistence is not part of the review criteria.
+- Use only 3 to 5 policies and one or two synthetic contracts.
+- Write only focused tests for critical transformations and schema validation.
+- Use clear error messages, but do not build production-grade resilience.
+
+OUT OF SCOPE UNLESS EXPLICITLY REQUESTED:
+- Authentication, authorization, SSO, and multi-user support
+- Malware scanning and quarantine
+- PostgreSQL
+- Enterprise deployment architecture
+- Full CI/CD pipelines
+- Prometheus dashboards and centralized observability
+- Production retention and secure-deletion workflows
+- OCR and scanned-document support
+- Complex table extraction
+- Sophisticated clause detection
+- Large policy libraries
+- Extensive automated RAG evaluation
+- High availability, scaling, backup, and disaster recovery
+- Formal model governance or security certification
+- Production privacy, legal, or compliance approval
+
+STOP RULES:
+- Do not add a new technology unless it is required to demonstrate the intended workflow.
+- Do not implement more than five policies before the complete flow works.
+- Do not support more than one primary document format.
+- Do not spend more than one focused session polishing the frontend.
+- If a feature takes more than two hours to debug, simplify it, mock it for the review if necessary, and document the limitation.
+- Once the end-to-end demo works, prioritize README documentation, screenshots, and rehearsal over additional features.
+
+EXPECTED TOTAL EFFORT:
+- Review-ready frontend with deterministic mock data: approximately 8 to 10 hours.
+- Small end-to-end working demonstration: approximately 24 to 30 hours.
+- Maximum permitted effort before reducing scope: 36 hours.
+
+============================================================
+SHARED ONE-MONTH WORKLOAD AND DELIVERY CONSTRAINTS
+============================================================
+
+OVERALL WORKLOAD:
+The developer is completing the following work during the same one-month period:
+
+1. RAG-Powered Vendor Compliance Auditor
+2. Autonomous Cloud FinOps Remediation Agent
+3. One separate group project
+
+The developer can perform at most 4 hours of actual project work per day. This daily limit applies across all three projects combined, not separately to each project.
+
+MONTHLY CAPACITY:
+Assuming approximately 20 working days during the month:
+
+- Maximum total capacity: approximately 80 hours
+- RAG project allocation: approximately 24 hours
+- FinOps project allocation: approximately 24 hours
+- Group project allocation: approximately 24 hours
+- Shared debugging and contingency reserve: approximately 8 hours
+
+The practical implementation limit for this individual project is therefore 24 focused hours.
+
+Do not plan the project around a 30-to-36-hour implementation unless the developer explicitly states that more time has become available.
+
+CONTROLLING DELIVERY RULE:
+Future AI assistants must design and generate code for a 24-hour demonstration project.
+
+The implementation should prove that the main technologies work together. It does not need to be production-ready, highly accurate, highly scalable, comprehensive, or suitable for use with real organizational data.
+
+If a proposed design is unlikely to fit within 24 focused hours, reduce the design before generating code.
+
+PRIMARY INTENT:
+The purpose of this project is to demonstrate implementation and technology integration.
+
+The following are more important than accuracy or completeness:
+
+- A clear and repeatable end-to-end workflow
+- Code that the developer can understand and explain
+- Stable behavior with small synthetic data
+- A simple interface or report that can be demonstrated
+- Clear separation between deterministic logic and optional AI behavior
+- A concise README and short demonstration script
+- Honest documentation of limitations and future improvements
+
+The following are not primary objectives:
+
+- Production readiness
+- Maximum model or classification accuracy
+- Exhaustive test coverage
+- Enterprise scalability
+- Large datasets
+- Complex cloud or document support
+- Extensive performance optimization
+- Broad policy coverage
+- Sophisticated architecture
+- Production security certification
+
+SHARED DELIVERY TARGET:
+Each individual project should be completed in approximately 24 focused hours.
+
+At 4 hours of actual work per day:
+
+- One individual project should require approximately 6 focused workdays.
+- Both individual projects should require approximately 12 focused workdays.
+- The remaining monthly capacity must be protected for the group project, debugging, reviews, and presentation preparation.
+
+RECOMMENDED FOUR-WEEK ALLOCATION:
+
+WEEK 1 - EARLY REVIEWABLE INTERFACES:
+- Build a simple review-ready interface for the RAG project.
+- Build a simple review-ready interface or report for the FinOps project.
+- Use deterministic synthetic or mock data.
+- Do not wait for either complete backend before creating something demonstrable.
+- Perform the assigned group-project work.
+
+WEEK 2 - COMPLETE THE RAG CORE WORKFLOW:
+- Implement only the minimum extraction, redaction, chunking, embeddings, retrieval, and structured finding workflow.
+- Use one synthetic text-based PDF.
+- Use approximately 3 sample policies.
+- Connect the completed components to the interface.
+- Perform the assigned group-project work.
+
+WEEK 3 - COMPLETE THE FINOPS CORE WORKFLOW:
+- Implement only the minimum synthetic telemetry loading, validation, policy evaluation, safety checks, savings calculation, and Terraform artifact generation.
+- Use one primary telemetry format.
+- Use approximately 3 to 5 policies.
+- Connect the completed components to the interface or report.
+- Perform the assigned group-project work.
+
+WEEK 4 - STABILIZATION AND PRESENTATION:
+- Fix only issues that affect the demonstration.
+- Add a few focused tests to each project.
+- Complete the README files.
+- Document limitations and future work.
+- Rehearse short demonstrations.
+- Reserve time for the group project.
+- Preserve the shared contingency reserve.
+
+DEFINITION OF DONE:
+This project is complete when:
+
+1. The main workflow runs locally using synthetic data.
+2. The core technologies required by the project are visibly demonstrated.
+3. The output is understandable and can be explained during a review.
+4. The most important safety boundary is enforced.
+5. A few focused tests verify the central logic.
+6. The README contains setup, run, architecture, limitations, and demonstration instructions.
+7. The developer can demonstrate the workflow in approximately 5 to 7 minutes.
+8. The repository contains no real confidential data, credentials, keys, certificates, or generated sensitive artifacts.
+
+The project is not required to be production-ready to be considered complete.
+
+DAILY FOUR-HOUR SESSION:
+A focused work session should normally be divided as follows:
+
+- 15 minutes: review the current task and acceptance criteria
+- 2 hours and 30 minutes: implementation with AI assistance
+- 45 minutes: run, debug, and test the implementation
+- 20 minutes: review and simplify the generated code
+- 10 minutes: record progress and prepare the next prompt
+
+AI-generated code must be run, inspected, and understood. Generating code alone does not mean that the task is complete.
+
+SCOPE REDUCTION ORDER:
+If the project is approaching its 24-hour limit, reduce scope in this order:
+
+1. Remove optional visual styling and interface enhancements.
+2. Remove secondary input formats.
+3. Reduce the number of policies and synthetic examples.
+4. Remove databases and save results in JSON instead.
+5. Remove audit-history and report-download features.
+6. Remove optional APIs, schedulers, and background processing.
+7. Remove optional AI summaries.
+8. Remove optional validation and analysis tools that are not central to the demonstration.
+9. Replace unstable optional integrations with clearly labeled deterministic demonstration data.
+10. Document omitted features under Future Work.
+
+Do not remove the central workflow or the primary technology that distinguishes the project.
+
+STOP RULES:
+- Do not add features merely because they are common in production systems.
+- Do not introduce a new framework when a simple Python function is sufficient.
+- Do not create abstractions for hypothetical future requirements.
+- Do not implement multi-user, high-availability, or enterprise deployment features.
+- Do not use real organizational data or real cloud credentials.
+- Do not spend more than 2 hours troubleshooting an optional feature.
+- Do not spend more than one focused work session on interface styling.
+- Do not increase the policy set until the end-to-end workflow works.
+- Do not optimize accuracy unless the current output prevents the demonstration from working.
+- Once the demonstration works, prioritize documentation and rehearsal over additional functionality.
+
+FUTURE AI ASSISTANT INSTRUCTION:
+Before generating code, evaluate whether the requested task fits within the remaining 24-hour project budget.
+
+Future AI assistants must:
+
+1. Prefer the smallest working implementation.
+2. Generate only the files needed for the current phase.
+3. Avoid unnecessary dependencies.
+4. Avoid production architecture unless explicitly requested.
+5. Use compact, readable, typed Python.
+6. Include only focused tests.
+7. Clearly label mock, synthetic, illustrative, and optional behavior.
+8. Identify the destination filename for every generated code block.
+9. Provide exact Windows PowerShell commands to run and verify the change.
+10. State which planned task should be removed if the new request increases the scope.
+11. Avoid rewriting working code without a clear reason.
+12. Keep the project demonstrable after each phase.
+
+PROMPT-SCOPE REMINDER:
+Include the following statement in future implementation prompts:
+
+"This is a small, synthetic, non-production demonstration with a practical limit of 24 focused hours. Generate the simplest working implementation for the current phase. Do not add production architecture, optional infrastructure, extensive testing, accuracy tuning, or extra features 
+
+============================================================
+1. PROJECT TITLE
+============================================================
+
+RAG-Powered Vendor Compliance Auditor
+
+============================================================
+2. PROJECT SUMMARY
+============================================================
+
+The RAG-Powered Vendor Compliance Auditor is a privacy-focused Third-Party Risk Management application. It analyzes vendor Master Services Agreements (MSAs), Service Level Agreements (SLAs), and similar contracts against internal enterprise IT security, data privacy, and operational governance policies.
+
+The system must identify compliant, non-compliant, ambiguous, and missing contractual commitments. Every finding must be supported by retrieved contract evidence, including the relevant clause and page number where available. The application must generate structured audit findings and remediation recommendations without relying on unsupported model claims.
+
+The solution is local-first to reduce exposure of confidential contract data. Sensitive information is redacted before embedding or LLM processing.
+
+DEMO SCOPE NOTE: Implement only the smallest end-to-end subset needed to demonstrate the technologies. The detailed production controls in this file are future-work references, not current implementation requirements.
+
+============================================================
+3. PROBLEM STATEMENT
+============================================================
+
+Manual contract review is slow, repetitive, inconsistent, and prone to missed risks. Vendor agreements may fail to meet internal requirements for encryption, breach notification, audit rights, data retention, data deletion, subcontractor controls, business continuity, availability, and other obligations. Confidential contract information must also be protected during AI processing.
+
+============================================================
+4. PROJECT OBJECTIVES
+============================================================
+
+1. Accept vendor contracts through a Streamlit web interface.
+2. Extract text and metadata from PDF, DOCX, and optionally TXT files.
+3. Detect and redact approved categories of Personally Identifiable Information using Microsoft Presidio and spaCy.
+4. Split sanitized contracts into meaningful clause-based chunks while preserving page and source metadata.
+5. Generate 384-dimensional embeddings locally using granite-embedding:30m through Ollama.
+6. Store and retrieve contract chunks using a persistent ChromaDB vector store.
+7. Query the vector store using enterprise compliance requirements.
+8. Use a local Ollama model to compare retrieved clauses with explicit policy rules.
+9. Classify each requirement as COMPLIANT, NON_COMPLIANT, AMBIGUOUS, MISSING, or REVIEW_REQUIRED.
+10. Return evidence-backed findings with citations and remediation recommendations.
+11. Store audit runs, findings, feedback, model versions, and prompt versions.
+12. Evaluate retrieval and generation quality using automated tests and RAG metrics.
+13. Package the system for repeatable execution using Docker.
+14. Keep human review mandatory for high-risk or uncertain findings.
+
+============================================================
+5. END-TO-END WORKFLOW
+============================================================
+
+Contract Upload
+    -> File Type and Size Validation
+    -> Malware/Quarantine Check in Production
+    -> Text and Page Metadata Extraction
+    -> PII Detection and Redaction
+    -> Clause-Based Semantic Chunking
+    -> Ollama Granite Embedding Generation
+    -> ChromaDB Storage
+    -> Policy-by-Policy Retrieval
+    -> Local LLM Compliance Comparison
+    -> Pydantic JSON Validation
+    -> Audit Dashboard and Report
+    -> Reviewer Feedback and Audit Storage
+    -> Automated Evaluation and CI/CD Quality Gates
+
+============================================================
+6. CORE ARCHITECTURE
+============================================================
+
+Frontend:
+- Streamlit web interface
+- Contract upload
+- Audit progress and findings
+- Evidence display
+- Reviewer feedback
+- Report download
+
+Backend:
+- FastAPI REST API
+- Upload routing
+- Processing orchestration
+- Audit and feedback endpoints
+- Health and metrics endpoints
+
+Document Processing:
+- pypdf and PyMuPDF for PDFs
+- python-docx for DOCX files
+- Preserve filename, page number, clause heading, and chunk identifier
+- Reject encrypted, unsupported, malformed, empty, or oversized files with controlled errors
+
+PII Redaction:
+- Microsoft Presidio Analyzer and Anonymizer
+- spaCy model: en_core_web_lg
+- Use an approved entity allow-list rather than every Presidio entity
+- Initial entity list: PERSON, EMAIL_ADDRESS, PHONE_NUMBER, IP_ADDRESS, LOCATION, URL, CREDIT_CARD, and IBAN_CODE
+- Add custom recognizers later for internal IDs, account IDs, contract references, hostnames, and customer identifiers
+
+Embedding Model:
+- Provider: local Ollama runtime
+- Model: granite-embedding:30m
+- Verified output dimension: 384
+- Use the same exact embedding model and version for document indexing and query generation
+- Record the model name, tag/digest, license, and security approval
+
+Vector Store:
+- ChromaDB PersistentClient for development and a single-instance demonstration
+- Persist original sanitized text, policy-safe metadata, source file ID, page, clause, and chunk ID
+- Use collection versioning when the chunking strategy or embedding model changes
+
+Inference Engine:
+- Ollama local runtime
+- Preferred model: granite4.1:8b for a 16 GB RAM VM
+- Smaller fallback: granite4.1:3b
+- Temperature: 0 or another low deterministic setting
+- The LLM compares retrieved evidence with an explicit policy rule
+- The LLM must not invent policy thresholds
+- Require structured JSON and validate it with Pydantic
+
+Persistence:
+- SQLite for a local single-instance demonstration
+- SQLAlchemy and Alembic for data access and migrations
+- PostgreSQL recommended for multi-user or multi-instance production deployment
+
+Evaluation:
+- Ragas for selected RAG metrics
+- PyTest, pytest-asyncio, and pytest-cov
+- Ground-truth synthetic contracts must include compliant, non-compliant, ambiguous, and missing cases
+
+Monitoring:
+- Structured logging with structlog
+- Prometheus-compatible metrics
+- Health endpoints for the API, ChromaDB, database, Ollama, and model availability
+
+============================================================
+7. POLICY BASELINE DESIGN
+============================================================
+
+Store enterprise policies as version-controlled YAML or JSON files. Each policy must contain:
+
+- policy_id
+- title
+- category
+- requirement
+- severity
+- expected commitment
+- measurable threshold if applicable
+- accepted alternatives
+- prohibited conditions
+- evidence requirements
+- remediation guidance
+- policy version
+
+Example policy areas:
+- Encryption at rest
+- Encryption in transit
+- Breach notification window
+- Audit and inspection rights
+- Data location and residency
+- Data retention
+- Secure data deletion
+- Subprocessor approval and notification
+- Access control
+- Incident response
+- Business continuity and disaster recovery
+- SLA availability
+- Recovery Time Objective
+- Recovery Point Objective
+- Vulnerability management
+- Termination assistance
+
+============================================================
+8. REQUIRED AUDIT OUTPUT SCHEMA
+============================================================
+
+Each finding should include:
+
+- audit_id
+- document_id
+- policy_id
+- policy_version
+- policy_requirement
+- status
+- severity
+- confidence
+- explanation
+- retrieved_clause
+- contract_page
+- clause_heading
+- chunk_id
+- retrieval_score
+- recommended_remediation
+- requires_human_review
+- embedding_model
+- inference_model
+- prompt_version
+- created_at
+
+Allowed status values:
+- COMPLIANT
+- NON_COMPLIANT
+- AMBIGUOUS
+- MISSING
+- REVIEW_REQUIRED
+
+Rules:
+- Reject malformed model output.
+- Do not mark a requirement compliant without supporting evidence.
+- A low retrieval score or conflicting clauses should produce REVIEW_REQUIRED.
+- A missing commitment should not be treated as non-compliant evidence unless the policy definition explicitly states that absence is non-compliance.
+- Preserve direct evidence separately from generated explanations.
+
+============================================================
+9. DATASET STRATEGY
+============================================================
+
+Use synthetic contracts and policy baselines to avoid exposing confidential contracts during development.
+
+The dataset should contain:
+- Synthetic MSAs
+- Synthetic SLAs
+- Enterprise security baselines
+- Privacy requirements
+- Operational governance requirements
+- Expected findings for every policy/document pair
+
+Required scenarios:
+1. Explicitly compliant clause
+2. Explicitly non-compliant clause
+3. Ambiguous wording
+4. Completely missing clause
+5. Conflicting clauses in different sections
+6. Clause with an exception or limitation
+7. Relevant clause hidden in an appendix
+8. Multiple similar but irrelevant clauses
+9. PII embedded in contract text
+10. Prompt-injection-style text inside a contract
+11. Tables and multi-page clauses
+12. Poor PDF extraction or empty pages
+
+Ground truth should record:
+- Expected status
+- Expected evidence text
+- Expected page or section
+- Expected policy ID
+- Reason for the expected classification
+
+Never silently use real company contracts in development or external services.
+
+============================================================
+10. CURRENT DEVELOPMENT ENVIRONMENT
+============================================================
+
+Operating environment:
+- Windows VM
+- Visual Studio Code
+- PowerShell terminal
+- System RAM: 16 GB according to Windows Task Manager
+
+Project path:
+C:\Users\T9925\Documents\DR\rag
+
+Python environment:
+- CPython 3.12, 64-bit
+- Local virtual environment: .venv
+- Expected interpreter:
+  C:\Users\T9925\Documents\DR\rag\.venv\Scripts\python.exe
+
+Confirmed working:
+- Python virtual environment
+- spaCy 3.8.16
+- en_core_web_lg loads successfully
+- Presidio analyzer executes and identifies PII
+- Ollama runtime works after restarting VS Code
+
+Known corporate-network constraint:
+- Corporate HTTPS inspection or an internal CA may cause CERTIFICATE_VERIFY_FAILED for external Python downloads; the selected Ollama embedding workflow avoids a Hugging Face runtime dependency.
+- Do not disable SSL verification.
+- Request the approved company root/intermediate CA certificates in PEM format and configure SSL_CERT_FILE.
+- If required, configure the approved HTTPS proxy.
+- Prefer internally mirrored and security-scanned model artifacts for production.
+
+Ollama embedding status at the time this context was written:
+- granite-embedding:30m is used instead of a Hugging Face MiniLM download.
+- The local Ollama embedding request has been verified to return 384-dimensional vectors.
+- Hugging Face access is not required for the application embedding workflow.
+
+Ollama model status:
+- Ollama is installed and reachable.
+- Confirm model availability with: ollama list
+- If no model is listed, pull granite4.1:8b or the company-approved equivalent.
+
+============================================================
+11. REQUIREMENTS.TXT
+============================================================
+
+# Web UI and API
+streamlit>=1.40,<2
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+python-multipart>=0.0.12,<1
+httpx>=0.27,<1
+
+# Configuration, validation, resilience and logging
+pydantic>=2.9,<3
+pydantic-settings>=2.5,<3
+python-dotenv>=1.0,<2
+tenacity>=9,<10
+structlog>=24,<26
+orjson>=3.10,<4
+
+# Document ingestion
+pypdf>=5,<7
+PyMuPDF>=1.24,<2
+python-docx>=1.1,<2
+filetype>=1.2,<2
+
+# PII detection and anonymization
+presidio-analyzer>=2.2,<3
+presidio-anonymizer>=2.2,<3
+spacy==3.8.16
+
+# Compatible CLI dependency set
+instructor>=1.13,<2
+typer>=0.27,<1
+click>=8.4.2,<9
+
+# Embeddings and retrieval
+numpy>=1.26,<3
+chromadb>=1.0,<2
+
+# Local LLM client
+ollama>=0.4,<1
+
+# Persistence and migrations
+SQLAlchemy>=2.0,<3
+alembic>=1.13,<2
+
+# Authentication and security helpers
+PyJWT[crypto]>=2.9,<3
+pwdlib[argon2]>=0.2,<1
+cryptography>=43,<49
+
+# Metrics and health monitoring
+prometheus-client>=0.21,<1
+
+# RAG evaluation and automated QA
+ragas>=0.2,<1
+pytest>=8,<10
+pytest-asyncio>=0.24,<2
+pytest-cov>=6,<8
+
+# Code quality and security scanning
+ruff>=0.8,<1
+mypy>=1.13,<2
+pip-audit>=2.7,<3
+bandit>=1.8,<2
+
+Important:
+- Run python -m pip check after dependency changes.
+- Generate an exact, hash-locked production dependency file only after tests pass in the target Docker build environment.
+- Do not upgrade one dependency in isolation when it participates in a known compatibility group.
+
+============================================================
+12. EXTERNAL SOFTWARE AND MODEL ARTIFACTS
+============================================================
+
+Required:
+- CPython 3.12, 64-bit
+- Git
+- Visual Studio Code
+- Docker Desktop or approved Docker Engine/Compose
+- Ollama runtime
+- spaCy model: en_core_web_lg
+- Ollama embedding model: granite-embedding:30m, verified at 384 dimensions
+- Ollama model: granite4.1:8b, granite4.1:3b, or another approved local instruction model
+
+Optional depending on scope:
+- Tesseract OCR for scanned/image-only contracts
+- PostgreSQL for multi-user production
+- Reverse proxy or enterprise ingress for TLS
+- Malware scanning service for document uploads
+- Enterprise SSO/OIDC identity provider
+- Prometheus and centralized log collection
+- Internal model, Python package, and container registries
+
+============================================================
+13. CORPORATE ACCESS AND SECURITY REQUESTS
+============================================================
+
+Request access to approved internal mirrors or allow-listing for:
+- pypi.org
+- files.pythonhosted.org
+- github.com
+- objects.githubusercontent.com
+- raw.githubusercontent.com, only if required
+- ollama.com and its approved model registry
+- approved Docker/container registry
+
+Request from IT/security:
+- Corporate root and intermediate CA bundle in PEM format
+- Approved HTTP/HTTPS proxy configuration
+- Internal package/model/container repository details
+- Permission to install or use Docker, Ollama, Git, and Python
+- Storage allocation for model files, vector data, uploaded documents, and audit history
+
+Never disable TLS certificate validation or set verify=False as a permanent workaround.
+
+============================================================
+14. ENVIRONMENT VARIABLES
+============================================================
+
+Create .env.example without secrets. Possible variables:
+
+APP_ENV=development
+LOG_LEVEL=INFO
+UPLOAD_DIR=./data/uploads
+SANITIZED_DIR=./data/sanitized
+CHROMA_PATH=./data/chroma
+DATABASE_URL=sqlite:///./data/audit/auditor.db
+OLLAMA_HOST=http://127.0.0.1:11434
+OLLAMA_MODEL=granite4.1:8b
+EMBEDDING_PROVIDER=ollama
+EMBEDDING_MODEL=granite-embedding:30m
+EMBEDDING_DIMENSION=384
+SPACY_MODEL=en_core_web_lg
+MAX_UPLOAD_MB=25
+RETRIEVAL_TOP_K=5
+LLM_TEMPERATURE=0
+MIN_RETRIEVAL_SCORE=DEFINE_DURING_EVALUATION
+PROMPT_VERSION=v1
+POLICY_VERSION=v1
+
+Corporate certificate variables, configured outside the repository:
+SSL_CERT_FILE=C:\CompanyCertificates\company-ca-bundle.pem
+REQUESTS_CA_BUNDLE=C:\CompanyCertificates\company-ca-bundle.pem
+HTTPS_PROXY=COMPANY_APPROVED_PROXY_IF_REQUIRED
+HTTP_PROXY=COMPANY_APPROVED_PROXY_IF_REQUIRED
+
+Production secrets must come from an approved secrets manager, not a committed .env file.
+
+============================================================
+15. RECOMMENDED PROJECT STRUCTURE
+============================================================
+
+rag/
+|-- app/
+|   |-- api/
+|   |-- core/
+|   |-- models/
+|   |-- services/
+|   |   |-- document_extractor.py
+|   |   |-- pii_redactor.py
+|   |   |-- chunker.py
+|   |   |-- embedder.py
+|   |   |-- vector_store.py
+|   |   |-- retriever.py
+|   |   |-- auditor.py
+|   |   |-- report_generator.py
+|   |-- ui/
+|   |-- main.py
+|-- data/
+|   |-- uploads/
+|   |-- sanitized/
+|   |-- chroma/
+|   |-- audit/
+|-- policies/
+|-- prompts/
+|-- reports/
+|-- synthetic_data/
+|-- tests/
+|   |-- unit/
+|   |-- integration/
+|   |-- evaluation/
+|-- .env.example
+|-- .gitignore
+|-- requirements.txt
+|-- Dockerfile
+|-- docker-compose.yml
+|-- README.md
+
+============================================================
+16. GITIGNORE REQUIREMENTS
+============================================================
+
+.venv/
+__pycache__/
+*.py[cod]
+.env
+*.pem
+*.key
+data/uploads/
+data/sanitized/
+data/chroma/
+data/audit/
+reports/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+Do not commit contracts, PII, certificates, secrets, model caches, databases, vector stores, or generated reports.
+
+============================================================
+17. VALIDATION COMMANDS
+============================================================
+
+Verify Python:
+python --version
+python -c "import sys; print(sys.executable)"
+python -m pip --version
+
+Verify dependencies:
+python -m pip check
+
+Verify spaCy:
+python -c "import spacy; spacy.load('en_core_web_lg'); print('spaCy model ready')"
+
+Verify Presidio:
+python -c "from presidio_analyzer import AnalyzerEngine; a=AnalyzerEngine(); print(a.analyze(text='Contact Daniel at daniel@example.com', language='en', entities=['PERSON','EMAIL_ADDRESS']))"
+
+Verify Ollama embedding model:
+python -c "import ollama; r=ollama.embed(model='granite-embedding:30m', input=['vendor encrypts data at rest']); print(len(r['embeddings']), len(r['embeddings'][0]))"
+
+Expected Ollama embedding result:
+1 384
+
+Verify Ollama:
+ollama --version
+ollama list
+Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags"
+
+Verify ChromaDB persistence:
+python -c "import chromadb; c=chromadb.PersistentClient(path='./data/chroma'); x=c.get_or_create_collection('test'); x.upsert(ids=['1'], documents=['The vendor encrypts data at rest']); print(x.count())"
+
+Reopen the environment and confirm the count remains 1:
+python -c "import chromadb; c=chromadb.PersistentClient(path='./data/chroma'); print(c.get_collection('test').count())"
+
+Run tests and quality checks:
+pytest
+pytest --cov=app --cov-report=term-missing
+ruff check .
+mypy app
+bandit -r app
+pip-audit
+
+============================================================
+18. PRODUCTION SECURITY REQUIREMENTS
+============================================================
+
+- Local-first or approved internal inference only
+- No original contract text sent to unauthorized external APIs
+- Validate file extension, MIME type, and file signature
+- Enforce maximum upload size and processing timeout
+- Scan uploads for malware in production
+- Sanitize filenames and isolate user files
+- Encrypt data in transit and at rest
+- Apply authentication, authorization, and per-user access controls
+- Redact PII from logs and telemetry
+- Define contract, vector, audit, and report retention periods
+- Support secure deletion
+- Use least privilege for services and storage
+- Protect against prompt injection embedded in contracts
+- Treat contract text as untrusted data, never as system instructions
+- Require citations for every model-generated finding
+- Require human review for high severity, ambiguous, missing, conflicting, or low-confidence findings
+- Track model name, model digest/version, prompt version, policy version, and code version
+- Back up audit records and test restoration procedures
+- Use dependency, container, and vulnerability scanning
+- Pin production container images, models, and dependencies by version and digest/hash
+
+============================================================
+19. TESTING AND ACCEPTANCE CRITERIA
+============================================================
+
+Minimum functional acceptance:
+- Supported files extract correctly
+- PII is redacted before embedding and inference
+- Ollama granite-embedding:30m returns 384-dimensional embeddings
+- ChromaDB data persists across restarts
+- Policy queries retrieve expected clauses
+- LLM output passes the Pydantic schema
+- Every finding includes evidence or is marked MISSING/REVIEW_REQUIRED
+- Reports preserve policy IDs, statuses, reasons, recommendations, and citations
+- Reviewer feedback is stored successfully
+
+Minimum quality acceptance:
+- Retrieval tests use ground-truth expected clauses
+- No fabricated citations
+- No compliance decision from irrelevant context
+- Missing evidence is not presented as proof
+- Prompt injection text does not override application instructions
+- Repeat runs at temperature 0 are sufficiently stable
+- Quality thresholds are defined from measured evaluation results, not guessed
+
+Minimum operational acceptance:
+- FastAPI health endpoint works
+- Streamlit can call the backend
+- Ollama unavailability causes a controlled error
+- ChromaDB or database failures do not corrupt an audit silently
+- Logs contain trace IDs but no raw PII
+- Docker deployment uses persistent volumes
+- CI/CD blocks release when tests or security checks fail
+
+============================================================
+20. IMPORTANT DESIGN DECISIONS
+============================================================
+
+- Retrieval and evidence are more important than fluent generation.
+- Presidio redaction occurs before embeddings and LLM calls.
+- The policy engine supplies explicit requirements and thresholds.
+- The LLM performs evidence-grounded comparison and explanation.
+- Pydantic validates all model output.
+- ChromaDB stores sanitized text only.
+- Original documents are retained only according to an approved policy.
+- Local Ollama inference is preferred for privacy.
+- Synthetic data is used for development and evaluation.
+- Human reviewers remain responsible for final legal/compliance decisions.
+- The system is a decision-support and audit-assistance tool, not autonomous legal advice.
+
+============================================================
+21. GUIDANCE FOR FUTURE AI ASSISTANTS
+============================================================
+
+When helping with this project:
+0. Apply Section 0 as the controlling scope. This is a 24-to-30-hour demonstration, so prefer the simplest working code and do not expand it into a production system.
+
+1. Use Python 3.12-compatible packages and code.
+2. Preserve the existing architecture unless a change is clearly justified.
+3. Prefer modular, typed, testable Python code.
+4. Use Pydantic models for inputs, configuration, and structured LLM outputs.
+5. Do not send contract content to public cloud APIs unless explicitly approved.
+6. Do not recommend disabling SSL verification.
+7. Account for the corporate CA/proxy restriction.
+8. Use the approved local Ollama embedding model and prevent fallback to unauthorized external embedding services.
+9. Keep the compliance decision tied to explicit policy rules and retrieved evidence.
+10. Keep LLM temperature low and outputs schema-constrained.
+11. Include unit tests, integration tests, error handling, logging, and security considerations.
+12. Do not simulate successful tool, model, or network output.
+13. Clearly distinguish development/demo choices from production requirements.
+14. Keep high-risk compliance findings subject to human review.
+15. If generating code, identify the destination filename for each code block.
+16. If changing dependencies, explain compatibility implications and update requirements.txt.
+17. Never place secrets, credentials, certificates, real PII, or confidential contracts in examples.
+
+============================================================
+22. CURRENT NEXT STEPS - SMALL DEMO ORDER
+============================================================
+1. Create the compact project skeleton and Streamlit entry point.
+2. Build the review-ready frontend using deterministic mock findings.
+3. Create 3 to 5 small policy rules and one synthetic text-based PDF.
+4. Implement basic page-level PDF extraction.
+5. Implement Presidio redaction for PERSON, EMAIL_ADDRESS, PHONE_NUMBER, and IP_ADDRESS.
+6. Implement simple paragraph or fixed-size chunking with page and chunk metadata.
+7. Confirm granite-embedding:30m returns 384-dimensional vectors.
+8. Store and retrieve sanitized chunks with a local ChromaDB collection.
+9. Retrieve the top 3 chunks for each sample policy.
+10. Use a local Ollama model to produce a small Pydantic-validated finding.
+11. Connect the real pipeline to the Streamlit interface.
+12. Add only a few focused tests, a concise README, limitations, and a 5 to 7 minute demo script.
+13. If time becomes limited, keep mock findings available and demonstrate each completed technology independently rather than adding complexity.
+
+============================================================
+23. FUTURE PROMPT TEMPLATE
+============================================================
+
+Use the following template after providing this context file:
+
+TASK:
+[Describe exactly what should be built, fixed, reviewed, or explained.]
+
+CURRENT FILES OR CODE:
+[Paste the relevant code, folder tree, command output, or error.]
+
+EXPECTED OUTPUT:
+[Specify code files, explanation, tests, commands, or architecture documentation.]
+
+CONSTRAINTS:
+- Windows VM
+- Python 3.12
+- Local Ollama
+- Corporate SSL/CA restrictions
+- No unauthorized external contract processing
+- Evidence-backed compliance findings
+- Human review for material decisions
+
+ACCEPTANCE CRITERIA:
+[List the exact conditions that must pass.]
+
+END OF PROJECT CONTEXT

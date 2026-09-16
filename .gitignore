@@ -1,0 +1,90 @@
+﻿# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local configuration, secrets, and certificates
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated application data
+data/uploads/
+data/sanitized/
+data/chroma/
+data/audit/
+reports/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+~$*
+
+# Build and packaging output
+build/
+dist/
+*.egg-info/
+
+# Local caches and model artifacts
+.cache/
+.ollama/
+
+# Superseded files and local working copies
+old versions/
+copilot files/
+synthetic_data/archive/
+policies/archive/
+archive/
+backup/
+backups/
+*_backup.py
+*_old.py
+*_copy.py
+
+# Generated session bundles and extraction artifacts
+session_*.zip
+session_*_files/
+_extracted.txt
+_v2_extracted.txt
+_renders*/
+
+# Local inventory and environment-check files
+rag_directory_inventory.txt
+rag_root_summary.txt
+package_test.txt
+rag_external_downloads_checklist.txt
+
+# Synthetic dataset allow-list
+synthetic_data/*.pdf
+synthetic_data/*.docx
+synthetic_data/*.txt
+synthetic_data/*.json
+!synthetic_data/synthetic_vendor_contract.pdf
+!synthetic_data/synthetic_vendor_contract.txt
+!synthetic_data/expected_findings.json

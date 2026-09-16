@@ -1,0 +1,38 @@
+MOCK_FINDINGS = [
+    {
+        "policy": "Encryption at Rest",
+        "status": "COMPLIANT",
+        "severity": "Low",
+        "evidence": "Vendor encrypts all customer data using AES-256.",
+        "page": 3,
+        "explanation": "The contract explicitly states data encryption.",
+        "recommendation": "No action required.",
+    },
+    {
+        "policy": "Breach Notification",
+        "status": "NON_COMPLIANT",
+        "severity": "High",
+        "evidence": "Vendor may notify customers within 30 days.",
+        "page": 7,
+        "explanation": "Notification window exceeds policy limit.",
+        "recommendation": "Require notification within 72 hours.",
+    },
+    {
+        "policy": "Audit Rights",
+        "status": "MISSING",
+        "severity": "Medium",
+        "evidence": "No matching clause found.",
+        "page": None,
+        "explanation": "Audit rights are absent.",
+        "recommendation": "Add audit and inspection clause.",
+    },
+    {
+        "policy": "Data Retention",
+        "status": "AMBIGUOUS",
+        "severity": "Medium",
+        "evidence": "Retention period referenced but undefined.",
+        "page": 9,
+        "explanation": "Insufficient commitment language.",
+        "recommendation": "Define retention period explicitly.",
+    },
+]
