@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from app.data.mock_findings import MOCK_FINDINGS
+from app.services.auditor import AuditGenerationError, audit_policy
 from app.services.chunker import chunk_document
 from app.services.document_extractor import (
     DocumentExtractionError,
@@ -22,6 +23,7 @@ from app.services.vector_store import get_collection, replace_document_chunks
 
 POLICY_PATH = ROOT / "policies" / "sample_policies.json"
 CHROMA_PATH = ROOT / "data" / "chroma"
+AUDIT_PROMPT_PATH = ROOT / "prompts" / "compliance_audit_v1.txt"
 TOP_K = 3
 
 st.set_page_config(page_title="Vendor Compliance Auditor", layout="wide")
@@ -37,6 +39,7 @@ def initialize_state() -> None:
         "retrieval_results": {},
         "indexed_chunk_count": 0,
         "indexed_document_id": None,
+        "real_findings": {},
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -51,6 +54,7 @@ def reset_downstream_state(*, clear_extraction: bool = False) -> None:
     st.session_state.retrieval_results = {}
     st.session_state.indexed_chunk_count = 0
     st.session_state.indexed_document_id = None
+    st.session_state.real_findings = {}
     st.session_state.audit_completed = False
 
 
@@ -63,12 +67,19 @@ except (FileNotFoundError, ValueError) as exc:
     st.info("Expected file: policies/sample_policies.json")
     st.stop()
 
+if not AUDIT_PROMPT_PATH.exists():
+    st.error(
+        "Audit prompt configuration could not be loaded. "
+        "Expected file: prompts/compliance_audit_v1.txt"
+    )
+    st.stop()
+
 st.sidebar.title("Demo Information")
 st.sidebar.info(
-    "This review version uses a synthetic contract and deterministic "
-    "audit findings. PDF extraction, PII redaction, chunking, embeddings, "
-    "ChromaDB indexing, and policy retrieval are real. Local LLM "
-    "classification will be connected in Session 6."
+    "This review version uses a synthetic contract. PDF extraction, PII "
+    "redaction, chunking, local embeddings, ChromaDB retrieval, and local "
+    "structured LLM findings are connected. Deterministic findings remain "
+    "available only as a demonstration fallback."
 )
 
 st.sidebar.subheader("Synthetic Dataset")
@@ -79,10 +90,10 @@ st.sidebar.write(
 )
 
 st.title("RAG-Powered Vendor Compliance Auditor")
-st.markdown("**Demonstration Version**")
+st.markdown("**Local Synthetic Demonstration**")
 st.warning(
-    "Illustrative demonstration only. Findings use synthetic data and are "
-    "not legal or compliance advice."
+    "Illustrative demonstration only. Generated findings may be inaccurate, "
+    "require human review, and are not legal or compliance advice."
 )
 
 uploaded_file = st.file_uploader("Upload Contract PDF", type=["pdf"])
@@ -119,9 +130,11 @@ if st.session_state.extracted_document is not None:
         "Preview extracted page",
         options=[page.page_number for page in document.pages],
         format_func=lambda value: f"Page {value}",
+        key="extracted_page_selector",
     )
     selected_page = next(
-        page for page in document.pages
+        page
+        for page in document.pages
         if page.page_number == selected_page_number
     )
     st.text_area(
@@ -151,6 +164,7 @@ if st.session_state.extracted_document is not None:
                 st.session_state.retrieval_results = {}
                 st.session_state.indexed_chunk_count = 0
                 st.session_state.indexed_document_id = None
+                st.session_state.real_findings = {}
                 st.session_state.audit_completed = False
         except Exception as exc:
             reset_downstream_state()
@@ -170,19 +184,22 @@ if st.session_state.extracted_document is not None:
         r3.metric("Chunks Created", len(chunks))
 
         st.caption(
-            "Only the sanitized text below may be embedded or stored in ChromaDB."
+            "Only the sanitized text below may be embedded, stored, "
+            "retrieved, or sent to the local instruction model."
         )
 
         preview_page_number = st.selectbox(
             "Preview sanitized page",
             options=[
-                page.page_number for page in summary.sanitized_document.pages
+                page.page_number
+                for page in summary.sanitized_document.pages
             ],
             format_func=lambda value: f"Page {value}",
             key="sanitized_page_selector",
         )
         sanitized_page = next(
-            page for page in summary.sanitized_document.pages
+            page
+            for page in summary.sanitized_document.pages
             if page.page_number == preview_page_number
         )
         st.text_area(
@@ -197,15 +214,17 @@ if st.session_state.extracted_document is not None:
 
         with st.expander("Sanitized chunk preview"):
             for chunk in chunks:
-                st.markdown(f"**{chunk.chunk_id} | Page {chunk.page_number}**")
+                st.markdown(
+                    f"**{chunk.chunk_id} | Page {chunk.page_number}**"
+                )
                 st.code(chunk.text)
 
 if st.session_state.contract_chunks:
     st.divider()
-    st.subheader("Vector Index and Policy Retrieval")
+    st.subheader("Vector Index, Retrieval, and Structured Analysis")
     st.caption(
         "Embeddings are generated locally with granite-embedding:30m. "
-        "Only sanitized chunks are stored in ChromaDB."
+        "Only sanitized chunks are stored in ChromaDB or analyzed locally."
     )
 
     if st.button("Index Sanitized Chunks"):
@@ -221,10 +240,19 @@ if st.session_state.contract_chunks:
                 st.session_state.indexed_chunk_count = stored
                 st.session_state.indexed_document_id = chunks[0].document_id
                 st.session_state.retrieval_results = {}
+                st.session_state.real_findings = {}
             st.success(f"Indexed {stored} sanitized chunks.")
         except EmbeddingError as exc:
+            st.session_state.indexed_chunk_count = 0
+            st.session_state.indexed_document_id = None
+            st.session_state.retrieval_results = {}
+            st.session_state.real_findings = {}
             st.error(str(exc))
         except Exception as exc:
+            st.session_state.indexed_chunk_count = 0
+            st.session_state.indexed_document_id = None
+            st.session_state.retrieval_results = {}
+            st.session_state.real_findings = {}
             print(f"Vector indexing error: {exc}")
             st.error("Vector indexing could not be completed.")
 
@@ -237,9 +265,11 @@ if st.session_state.contract_chunks:
         v2.metric("Embedding Dimension", 384)
 
         selected_retrieval_policy = st.selectbox(
-            "Select a policy retrieval query",
+            "Select a policy",
             policy_set.policies,
-            format_func=lambda policy: f"{policy.policy_id}: {policy.title}",
+            format_func=lambda policy: (
+                f"{policy.policy_id}: {policy.title}"
+            ),
             key="retrieval_policy_selector",
         )
 
@@ -255,6 +285,10 @@ if st.session_state.contract_chunks:
                 st.session_state.retrieval_results[
                     selected_retrieval_policy.policy_id
                 ] = results
+                st.session_state.real_findings.pop(
+                    selected_retrieval_policy.policy_id,
+                    None,
+                )
             except EmbeddingError as exc:
                 st.error(str(exc))
             except Exception as exc:
@@ -265,6 +299,7 @@ if st.session_state.contract_chunks:
             selected_retrieval_policy.policy_id,
             [],
         )
+
         if current_results:
             st.caption(
                 "Vector distance is shown for demonstration purposes. "
@@ -285,6 +320,94 @@ if st.session_state.contract_chunks:
                         "(lower is closer)"
                     )
 
+        if current_results:
+            st.subheader("Local Structured Finding")
+
+            if st.button("Generate Structured Finding"):
+                try:
+                    with st.spinner(
+                        "Comparing the policy with retrieved evidence "
+                        "using the local instruction model..."
+                    ):
+                        finding = audit_policy(
+                            selected_retrieval_policy,
+                            current_results,
+                            AUDIT_PROMPT_PATH,
+                        )
+                        st.session_state.real_findings[
+                            selected_retrieval_policy.policy_id
+                        ] = finding
+                except AuditGenerationError as exc:
+                    st.session_state.real_findings.pop(
+                        selected_retrieval_policy.policy_id,
+                        None,
+                    )
+                    st.error(str(exc))
+
+            current_finding = st.session_state.real_findings.get(
+                selected_retrieval_policy.policy_id
+            )
+
+            if current_finding is not None:
+                f1, f2, f3 = st.columns(3)
+                f1.metric("Status", current_finding.status.value)
+                f2.metric("Severity", current_finding.severity)
+                f3.metric(
+                    "Confidence",
+                    f"{current_finding.confidence:.2f}",
+                )
+
+                st.write("### Explanation")
+                st.write(current_finding.explanation)
+
+                st.write("### Evidence")
+                st.code(
+                    current_finding.retrieved_clause
+                    or "No supporting clause found."
+                )
+
+                d1, d2 = st.columns(2)
+                d1.write(
+                    "**Contract Page:** "
+                    f"{current_finding.contract_page or 'No evidence page'}"
+                )
+                d2.write(
+                    "**Chunk ID:** "
+                    f"{current_finding.chunk_id or 'No evidence chunk'}"
+                )
+
+                if current_finding.retrieval_distance is not None:
+                    st.caption(
+                        "Authoritative retrieval distance: "
+                        f"{current_finding.retrieval_distance:.4f}"
+                    )
+
+                st.write("### Recommendation")
+                st.write(current_finding.recommended_remediation)
+
+                if current_finding.requires_human_review:
+                    st.warning("Human review is required for this finding.")
+                else:
+                    st.info(
+                        "Automated result available. Human verification is "
+                        "still recommended for this demonstration."
+                    )
+
+                with st.expander("Finding provenance"):
+                    st.json(
+                        {
+                            "policy_id": current_finding.policy_id,
+                            "policy_version": current_finding.policy_version,
+                            "embedding_model": (
+                                current_finding.embedding_model
+                            ),
+                            "inference_model": (
+                                current_finding.inference_model
+                            ),
+                            "prompt_version": current_finding.prompt_version,
+                        }
+                    )
+
 st.divider()
 col1, col2 = st.columns([1, 2])
 
@@ -299,9 +422,13 @@ with col1:
             )
 
 with col2:
-    st.subheader("Audit Findings")
+    st.subheader("Deterministic Demo Fallback")
+    st.caption(
+        "This section is retained only as a fallback for demonstrations. "
+        "It is separate from the real local retrieval and LLM workflow above."
+    )
 
-    if st.button("Run Mock Audit"):
+    if st.button("Run Deterministic Fallback Audit"):
         st.session_state.audit_completed = True
 
     if st.session_state.audit_completed:
@@ -321,30 +448,37 @@ with col2:
         m3.metric("Issues", issues)
         m4.metric("Review Needed", review)
 
-        st.subheader("Audit Findings Table")
+        st.subheader("Fallback Findings Table")
         st.dataframe(df, use_container_width=True, hide_index=True)
 
-        st.subheader("Finding Summary")
-        for finding in MOCK_FINDINGS:
-            message = f"{finding['policy']} : {finding['status']}"
-            if finding["status"] == "COMPLIANT":
+        st.subheader("Fallback Finding Summary")
+        for fallback_finding in MOCK_FINDINGS:
+            message = (
+                f"{fallback_finding['policy']} : "
+                f"{fallback_finding['status']}"
+            )
+            if fallback_finding["status"] == "COMPLIANT":
                 st.success(message)
-            elif finding["status"] == "NON_COMPLIANT":
+            elif fallback_finding["status"] == "NON_COMPLIANT":
                 st.error(message)
-            elif finding["status"] in {"MISSING", "REVIEW_REQUIRED"}:
+            elif fallback_finding["status"] in {
+                "MISSING",
+                "REVIEW_REQUIRED",
+            }:
                 st.warning(message)
             else:
                 st.info(message)
 
-        st.subheader("Evidence Details")
-        selected_policy = st.selectbox(
-            "Select Policy",
+        st.subheader("Fallback Evidence Details")
+        selected_fallback_policy = st.selectbox(
+            "Select fallback policy",
             [item["policy"] for item in MOCK_FINDINGS],
             key="mock_finding_policy_selector",
         )
         selected_finding = next(
-            item for item in MOCK_FINDINGS
-            if item["policy"] == selected_policy
+            item
+            for item in MOCK_FINDINGS
+            if item["policy"] == selected_fallback_policy
         )
 
         st.write("### Evidence")
@@ -358,7 +492,6 @@ with col2:
         page_display = page if page is not None else "No evidence page"
         st.write(f"**Contract Page:** {page_display}")
         st.caption(
-            "PDF extraction, PII redaction, chunking, embeddings, and "
-            "retrieval are real. Audit findings remain deterministic until "
-            "local LLM classification is connected in Session 6."
+            "These fallback findings are deterministic and do not use the "
+            "retrieved evidence or local instruction model."
         )
