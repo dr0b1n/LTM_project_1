@@ -1,25 +1,23 @@
 # RAG-Powered Vendor Compliance Auditor
 
-A privacy-focused, local-first demonstration application that reviews a synthetic vendor agreement against a small set of security, privacy, and operational-governance policies. The project uses Retrieval-Augmented Generation (RAG) to retrieve relevant contract evidence and a local language model to produce structured, evidence-backed findings.
+A local-first demonstration application that reviews synthetic vendor contracts against version-controlled security, privacy, and operational policies. The application uses Retrieval-Augmented Generation (RAG) to retrieve relevant contract evidence and a local Ollama instruction model to produce structured, evidence-backed findings.
 
-> **Important:** This repository is a synthetic, non-production demonstration. It does not provide legal advice, does not make legally authoritative compliance decisions, and must not be used as a substitute for qualified legal, privacy, security, procurement, or compliance review. Material, ambiguous, missing, conflicting, and low-confidence findings require human review.
+> **Important:** This repository is a synthetic, non-production demonstration. It does not provide legal advice or make legally authoritative compliance decisions. Generated findings, especially missing, ambiguous, conflicting, low-confidence, or fallback findings, require qualified human review.
 
 ## Contents
 
-- [Purpose](#purpose)
+- [Project Overview](#project-overview)
 - [Problem Statement](#problem-statement)
-- [Objectives](#objectives)
-- [Features](#features)
+- [Current Implemented State](#current-implemented-state)
 - [End-to-End Workflow](#end-to-end-workflow)
 - [Architecture](#architecture)
-- [How RAG Is Used](#how-rag-is-used)
-- [Policy Model](#policy-model)
-- [Finding Statuses](#finding-statuses)
+- [Policy Set](#policy-set)
 - [Synthetic Dataset](#synthetic-dataset)
+- [Finding Statuses](#finding-statuses)
 - [Privacy and PII Redaction](#privacy-and-pii-redaction)
-- [Embeddings and ChromaDB](#embeddings-and-chromadb)
-- [Structured Local LLM Analysis](#structured-local-llm-analysis)
-- [Data Storage](#data-storage)
+- [Embeddings, ChromaDB, and Retrieval](#embeddings-chromadb-and-retrieval)
+- [Structured Local Model Analysis](#structured-local-model-analysis)
+- [Complete Audit, Evaluation, and Export](#complete-audit-evaluation-and-export)
 - [Repository Structure](#repository-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -27,500 +25,433 @@ A privacy-focused, local-first demonstration application that reviews a syntheti
 - [Running the Application](#running-the-application)
 - [Demonstration Guide](#demonstration-guide)
 - [Testing](#testing)
-- [Expected Demonstration Outcomes](#expected-demonstration-outcomes)
-- [Security Boundaries](#security-boundaries)
+- [Runtime Data and Git](#runtime-data-and-git)
 - [Known Limitations](#known-limitations)
 - [Troubleshooting](#troubleshooting)
-- [Future Production Enhancements](#future-production-enhancements)
+- [Future Enhancements](#future-enhancements)
 - [Responsible Use](#responsible-use)
 
-## Purpose
+## Project Overview
 
-The purpose of this project is to demonstrate that the following technologies can be connected into a clear, repeatable, local RAG workflow:
+The project demonstrates a complete local RAG workflow for vendor-contract review:
 
-- Streamlit user interface
-- Text-based PDF extraction
-- Microsoft Presidio and spaCy PII redaction
-- Paragraph-based contract chunking
-- Local Ollama embeddings
-- ChromaDB vector storage and retrieval
-- Policy-driven evidence comparison
-- Local Ollama language-model analysis
-- Pydantic-validated structured findings
-- Evidence and page citations in the user interface
+- Upload a text-based vendor-contract PDF.
+- Extract text while preserving page numbers.
+- Detect and replace selected PII before AI processing.
+- Split sanitized text into page-aware chunks.
+- Generate local embeddings with Ollama.
+- Store sanitized chunks and metadata in ChromaDB.
+- Retrieve the top three chunks relevant to a selected policy.
+- Generate a structured finding with a local instruction model.
+- Validate model output with Pydantic.
+- Preserve authoritative evidence text, page number, chunk ID, and retrieval distance.
+- Run all policies as a complete audit.
+- Compare generated findings with synthetic ground truth where available.
+- Download complete audit results as JSON and a summary as CSV.
 
-The primary success criterion is a stable, understandable end-to-end demonstration using a small synthetic dataset. Production scalability, exhaustive policy coverage, formal legal accuracy, enterprise deployment, and large-scale RAG evaluation are outside the demonstration scope.
+The application is intentionally local-first. Contract processing, embeddings, retrieval, and model inference are designed to run on the same machine.
 
 ## Problem Statement
 
-Vendor agreements can contain important commitments relating to encryption, incident notification, audit rights, data retention, deletion, subprocessors, availability, disaster recovery, and other controls. Manual review can be slow, repetitive, inconsistent, and vulnerable to missed clauses.
+Vendor agreements may contain important commitments relating to encryption, access control, incident notification, audit rights, retention, deletion, subprocessors, logging, vulnerability remediation, and service continuity. Manual review can be repetitive and may miss clauses, exceptions, conflicts, or absent commitments.
 
-A useful review assistant should not simply declare that a contract is compliant. The application should:
+The application is designed as a review assistant rather than an autonomous decision-maker. For each policy, it aims to show:
 
-1. identify the policy being evaluated;
-2. retrieve the most relevant contract evidence;
-3. preserve the source page and chunk identifier;
-4. compare the evidence with an explicit policy requirement;
-5. return a structured status, explanation, and recommendation; and
-6. require human review when the evidence is missing, ambiguous, conflicting, or uncertain.
+1. the explicit policy requirement;
+2. the most relevant sanitized contract evidence;
+3. the source page and chunk identifier;
+4. a structured compliance status;
+5. an explanation and remediation recommendation; and
+6. whether human review is required.
 
-## Objectives
+## Current Implemented State
 
-The demonstration is designed to:
-
-1. accept a text-based PDF through a Streamlit interface;
-2. extract text while preserving page metadata;
-3. detect and replace selected PII before downstream AI processing;
-4. split sanitized text into readable chunks;
-5. generate 384-dimensional embeddings locally with Ollama;
-6. store and query sanitized chunks in ChromaDB;
-7. load explicit policies from version-controlled JSON;
-8. retrieve the top contract evidence for each policy;
-9. compare policy requirements with retrieved evidence using a local instruction model;
-10. validate generated findings with Pydantic;
-11. display status, severity, evidence, page, explanation, recommendation, and human-review requirements; and
-12. use synthetic data so no real confidential contract is required.
-
-## Features
+The current application includes the following working capabilities.
 
 ### Document processing
 
-- PDF upload through Streamlit
-- Text-based PDF extraction with `pypdf`
-- Page count, filename, and character-count display
-- Page-by-page extraction preview
-- Controlled rejection of invalid, encrypted, empty, or textless PDFs
-- No OCR or scanned-document support in the demonstration
+- Streamlit PDF upload
+- Text-based PDF validation and extraction with `pypdf`
+- Page count, source filename, and character count
+- Page-by-page extracted-text preview
+- Controlled rejection of empty, invalid, encrypted, or textless PDFs
 
 ### Privacy processing
 
-- Selected PII detection with Microsoft Presidio
+- Microsoft Presidio analysis
 - spaCy `en_core_web_lg` NLP model
-- Typed replacement placeholders such as `<PERSON>` and `<EMAIL_ADDRESS>`
-- Approved demonstration entity allow-list:
+- Allow-listed PII entities:
   - `PERSON`
   - `EMAIL_ADDRESS`
   - `PHONE_NUMBER`
   - `IP_ADDRESS`
-- Custom recognizer support for the reserved `.test` synthetic email domain
-- Redaction counts and sanitized-page preview
-- Sanitized-only downstream processing boundary
+- Custom recognition for synthetic `.test` email addresses
+- Typed placeholders such as `<PERSON>` and `<EMAIL_ADDRESS>`
+- Sanitized-page preview and PII detection counts
+- Sanitized-only downstream boundary
 
-### Chunking
+### Chunking and retrieval
 
-- Simple paragraph-based chunking
-- Long-text splitting when a paragraph exceeds the configured size
-- Unique chunk IDs
-- Preserved document ID, source filename, and page number
-- Explicit `sanitized` metadata flag
+- Paragraph-based chunking with long-text splitting
+- Unique chunk identifiers
+- Preserved page number, source filename, and document ID
+- Local embeddings through Ollama
+- ChromaDB persistent vector storage
+- Top-three semantic retrieval per policy
+- Retrieval display with rank, page, chunk ID, text, and vector distance
+- Replacement indexing to avoid duplicating the same document ID
 
-### Embeddings and retrieval
+### Structured findings
 
-- Local embedding generation through Ollama
-- Embedding model: `granite-embedding:30m`
-- Expected embedding dimension: 384
-- Persistent ChromaDB collection
-- Sanitized document text and metadata storage
-- Top-three semantic evidence retrieval per policy
-- Retrieval display with rank, page, chunk ID, and vector distance
-- Replacement indexing to avoid duplicating the same document
-
-### Policy-driven audit
-
-- Version-controlled JSON policy set
-- Explicit policy requirements and thresholds
-- Policy severity and version tracking
-- Local LLM comparison against retrieved evidence
-- Structured JSON output
+- Local Ollama instruction-model analysis
+- Strict structured-output schema
 - Pydantic validation
-- Human-review flag
-- Evidence-backed explanations and remediation recommendations
-- Rejection or controlled handling of malformed model output
+- Model-selected chunk validation
+- Authoritative evidence metadata supplied by the application
+- Rejection of invented chunk IDs
+- Human-review enforcement for material or uncertain statuses
+- Conservative `REVIEW_REQUIRED` fallback in the complete-audit workflow when a smaller model returns invalid output
+
+### Complete audit and reporting
+
+- Single-policy evidence review and finding generation
+- Complete audit across the full policy set
+- Per-policy progress display
+- Partial-failure isolation
+- Consolidated audit summary
+- Status breakdown and detailed finding inspection
+- Synthetic ground-truth comparison when the matching expected-findings file exists
+- Status-match and page-match metrics
+- Audit JSON download
+- Findings CSV download
 
 ### Interface
 
-- Review-oriented Streamlit dashboard
-- Upload and processing workflow
-- Document extraction preview
-- Sanitized-text and chunk preview
-- Policy viewer
-- Vector-indexing controls
-- Evidence-retrieval controls
-- Finding metrics and status display
-- Evidence, page, explanation, and recommendation viewer
-- Clear synthetic-data and non-production disclaimers
+The Streamlit interface uses a review-oriented visual design with:
+
+- warm white surfaces;
+- plum and burgundy headers;
+- muted gold accents;
+- workflow-stage indicators;
+- policy, evidence, and finding sections;
+- executive audit metrics;
+- readable rounded text areas; and
+- clear synthetic-data and responsible-use notices.
 
 ## End-to-End Workflow
 
 ```text
-Synthetic vendor contract PDF
-            |
-            v
-File and PDF validation
-            |
-            v
-Page-level text extraction
-            |
-            v
-Presidio + spaCy PII detection
-            |
-            v
+Synthetic contract PDF
+        |
+        v
+PDF validation and page-level extraction
+        |
+        v
+Presidio and spaCy PII detection
+        |
+        v
 Typed placeholder replacement
-            |
-            v
-Sanitized paragraph chunks
-            |
-            v
+        |
+        v
+Sanitized page-aware chunks
+        |
+        v
 Ollama granite-embedding:30m
-            |
-            v
-ChromaDB persistent collection
-            |
-            v
+        |
+        v
+ChromaDB vector collection
+        |
+        v
 Policy requirement embedding
-            |
-            v
-Top-k sanitized evidence retrieval
-            |
-            v
+        |
+        v
+Top-three sanitized evidence chunks
+        |
+        v
 Local Ollama policy/evidence comparison
-            |
-            v
-Pydantic structured-output validation
-            |
-            v
-Streamlit finding and evidence display
-            |
-            v
-Human review
+        |
+        v
+Pydantic validation and evidence integrity checks
+        |
+        v
+Single finding or complete policy-set audit
+        |
+        v
+Evaluation, JSON export, CSV export, and human review
 ```
 
 ## Architecture
 
-The demonstration uses direct local Python function calls rather than a separate API tier. This is intentional: the smallest architecture is easier to run, inspect, explain, and complete within the project time limit.
-
 ```text
-+-----------------------+
-| Streamlit Interface   |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Document Extractor    |
-| pypdf                 |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| PII Redactor          |
-| Presidio + spaCy      |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Chunker               |
-| Sanitized text only   |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Local Embedder        |
-| Ollama / Granite      |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| ChromaDB              |
-| Vectors + metadata    |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Retriever             |
-| Top-k evidence        |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Local Auditor         |
-| Ollama + Pydantic     |
-+-----------+-----------+
-            |
-            v
-+-----------------------+
-| Evidence-backed       |
-| Streamlit Finding     |
-+-----------------------+
+Streamlit UI
+    |
+    +-- Document extractor (pypdf)
+    |
+    +-- PII redactor (Presidio + spaCy)
+    |
+    +-- Chunker (sanitized text only)
+    |
+    +-- Ollama embedder (granite-embedding:30m)
+    |
+    +-- ChromaDB vector store
+    |
+    +-- Policy retriever (top 3 chunks)
+    |
+    +-- Ollama auditor (local instruction model)
+    |
+    +-- Pydantic finding validation
+    |
+    +-- Batch audit runner
+    |
+    +-- Synthetic evaluator
+    |
+    +-- JSON and CSV report exporters
 ```
 
-### Why there is no FastAPI layer
+The demonstration uses direct local Python calls rather than a separate API layer. Authentication, multi-user services, background workers, and enterprise deployment are outside the current scope.
 
-A production system might separate the UI and backend using FastAPI. This demonstration uses direct calls because authentication, multi-user support, remote deployment, background workers, and service scaling are out of scope. Avoiding an unnecessary API keeps the review focused on the RAG and privacy workflow.
+## Policy Set
 
-## How RAG Is Used
-
-RAG stands for Retrieval-Augmented Generation. In this project, retrieval and generation have separate responsibilities.
-
-### Retrieval
-
-The system converts a policy requirement into an embedding and asks ChromaDB for the closest sanitized contract chunks. Retrieval returns possible evidence, not a compliance decision.
-
-```text
-Policy requirement
-        |
-        v
-384-dimensional query embedding
-        |
-        v
-ChromaDB similarity search
-        |
-        v
-Top-three sanitized contract chunks
-```
-
-The returned evidence includes:
-
-- sanitized clause text;
-- document ID;
-- source filename;
-- page number;
-- chunk ID; and
-- vector distance.
-
-### Generation
-
-The local instruction model receives:
-
-- the explicit policy requirement;
-- severity and expected commitment;
-- the retrieved evidence;
-- page and chunk metadata; and
-- strict output instructions.
-
-The language model compares the evidence with the policy. The model must not invent policy thresholds or unsupported contract evidence.
-
-### Important retrieval boundary
-
-Vector retrieval always returns the nearest available content. A rank-one result does not prove compliance. If no relevant commitment exists, the final analysis should produce `MISSING` or `REVIEW_REQUIRED`, rather than treating an unrelated nearest-neighbor result as evidence.
-
-## Policy Model
-
-Policies are business rules defining what the organization expects from a vendor agreement. Policies are not contract clauses and are not generated by the language model.
-
-Policies are stored at:
+Policies are stored in:
 
 ```text
 policies/sample_policies.json
 ```
 
-A policy record contains fields similar to:
+The active policy baseline contains 12 controls:
 
-```json
-{
-  "policy_id": "POL-002",
-  "title": "Breach Notification",
-  "category": "Incident Management",
-  "requirement": "Vendor must notify the customer of a confirmed security incident within 72 hours.",
-  "severity": "HIGH",
-  "expected_commitment": "A notification deadline no longer than 72 hours after confirmation.",
-  "remediation_guidance": "Amend the notification deadline to 72 hours or less after confirmation.",
-  "policy_version": "v1"
-}
+1. `POL-001` — Encryption at Rest
+2. `POL-002` — Encryption in Transit
+3. `POL-003` — Identity and Access Management
+4. `POL-004` — Privileged Access Security
+5. `POL-005` — Security Logging and Monitoring
+6. `POL-006` — Vulnerability Remediation
+7. `POL-007` — Security Incident Notification
+8. `POL-008` — Audit and Assurance Rights
+9. `POL-009` — Data Retention
+10. `POL-010` — Secure Data Return and Deletion
+11. `POL-011` — Subprocessor Management
+12. `POL-012` — Service Continuity and Recovery
+
+Each policy includes:
+
+- stable policy ID;
+- title and category;
+- explicit requirement;
+- severity;
+- expected contractual commitment;
+- remediation guidance; and
+- policy version.
+
+Policies are stored as JSON because they are reviewable business rules rather than executable application logic.
+
+## Synthetic Dataset
+
+The active synthetic dataset is stored under:
+
+```text
+synthetic_data/
 ```
 
-### Why policies are stored as JSON
+The repository contains multiple synthetic contracts so the application can demonstrate varied contract quality, different clause styles, missing obligations, measurable commitments, and selected conflicts without using confidential agreements.
 
-- Policies are data, not executable Python logic.
-- Reviewers can inspect requirements without reading application code.
-- Policy changes can be version-controlled.
-- Stable IDs can be preserved across revisions.
-- A policy version can be recorded with every finding.
-- JSON can later be migrated into a relational policy-management system.
+### 1. Cloud Analytics Services Agreement
 
-### Demonstration policies
+Files:
 
-The active policy set contains five requirements:
+```text
+synthetic_data/cloud_analytics_agreement.pdf
+synthetic_data/cloud_analytics_agreement.txt
+synthetic_data/cloud_analytics_agreement_expected_findings.json
+```
 
-1. `POL-001` - Encryption at Rest
-2. `POL-002` - Breach Notification
-3. `POL-003` - Audit Rights
-4. `POL-004` - Data Retention
-5. `POL-005` - Subprocessor Notification
+Characteristics:
 
-The project deliberately limits the number of policies so the entire workflow remains easy to test and explain.
+- 12-page primary review contract
+- explicit encryption, access, and logging clauses
+- measurable continuity commitments
+- deliberately weaker incident-notification and vulnerability-remediation terms
+- ambiguous retention language
+- controlled subprocessor-notification conflict
+- suitable for demonstrating `COMPLIANT`, `NON_COMPLIANT`, `AMBIGUOUS`, and `REVIEW_REQUIRED` outcomes
+
+### 2. Managed IT Support Agreement
+
+Files:
+
+```text
+synthetic_data/managed_it_support_agreement.pdf
+synthetic_data/managed_it_support_agreement.txt
+synthetic_data/managed_it_support_agreement_expected_findings.json
+```
+
+Characteristics:
+
+- 10-page weaker vendor agreement
+- several vague or absent security commitments
+- useful for testing `MISSING` and `AMBIGUOUS` findings
+- includes weaker shared-access, logging, incident, deletion, and continuity language
+- helps verify that nearest-neighbor retrieval is not automatically treated as proof of compliance
+
+### 3. Customer Support SaaS Agreement
+
+Files:
+
+```text
+synthetic_data/customer_support_saas_agreement.pdf
+synthetic_data/customer_support_saas_agreement.txt
+synthetic_data/customer_support_saas_agreement_expected_findings.json
+```
+
+Characteristics:
+
+- 14-page stronger contract
+- explicit encryption, access, logging, incident, subprocessor, and recovery commitments
+- selected exceptions and international-support considerations
+- useful for testing a mostly compliant agreement with a smaller number of review points
+- includes contract text that must remain untrusted evidence rather than model instructions
+
+### 4. Synthetic Vendor Contract v2
+
+Files:
+
+```text
+synthetic_data/synthetic_vendor_contract_v2.pdf
+synthetic_data/synthetic_vendor_contract_v2.txt
+synthetic_data/synthetic_vendor_contract_v2_expected_findings.json
+```
+
+Characteristics:
+
+- earlier expanded synthetic agreement retained as an additional test document
+- contains clear security, incident, retention, subprocessor, and continuity clauses
+- supports regression and comparison with the newer multi-contract dataset
+
+### 5. Seven-Page Vendor Services Agreement
+
+File:
+
+```text
+synthetic_data/synthetic_vendor_services_agreement_7_pages.pdf
+```
+
+Characteristics:
+
+- seven-page text-heavy synthetic agreement
+- designed for more reliable retrieval and classification with a smaller local instruction model
+- uses explicit headings, direct obligations, concrete deadlines, and fewer vague clauses
+- includes clear commitments for encryption, TLS, MFA, access reviews, log retention, vulnerability remediation, incident notification, backups, recovery objectives, availability, subprocessors, deletion, audit rights, and AI-use restrictions
+
+The current repository inventory does not include a matching text source or expected-findings JSON for this seven-page PDF. The PDF can be used for extraction, redaction, indexing, retrieval, and live finding generation. Ground-truth evaluation requires a matching file named:
+
+```text
+synthetic_data/synthetic_vendor_services_agreement_7_pages_expected_findings.json
+```
+
+### Dataset documentation
+
+The active dataset also includes:
+
+```text
+synthetic_data/README_DATASET.md
+```
+
+### Archived data
+
+Previous dataset and policy versions are kept locally under:
+
+```text
+synthetic_data/archive/
+policies/archive/
+```
+
+These archive directories are ignored by Git. Active synthetic files listed above are tracked.
+
+### Why synthetic data is used
+
+- **Confidentiality:** Real vendor contracts may contain sensitive commercial, technical, personal, and legal information.
+- **Known ground truth:** Expected statuses and expected pages can be defined in advance.
+- **Repeatability:** The same input can be reused for extraction, privacy, retrieval, and model testing.
+- **Coverage:** The dataset deliberately includes compliant, non-compliant, ambiguous, missing, and conflicting scenarios.
+- **Safe PII testing:** Fictional or reserved values can be used to demonstrate redaction.
+- **Debugging:** Expected evidence helps isolate extraction, chunking, retrieval, or generation failures.
+- **Responsible review:** The prototype can be demonstrated without implying readiness for real confidential contracts.
+
+### Ground-truth separation
+
+Expected-findings JSON files are used only after model generation for evaluation. They must not be embedded, stored in ChromaDB, passed to retrieval, or included in the Ollama prompt.
 
 ## Finding Statuses
 
 The structured finding model supports:
 
-### `COMPLIANT`
+- `COMPLIANT` — retrieved evidence clearly satisfies the policy requirement.
+- `NON_COMPLIANT` — relevant evidence conflicts with or falls below the policy requirement.
+- `AMBIGUOUS` — relevant language exists but is vague, incomplete, or non-measurable.
+- `MISSING` — no retrieved evidence establishes the required commitment.
+- `REVIEW_REQUIRED` — evidence or model output is conflicting, weak, malformed, or otherwise unsafe to classify conclusively.
 
-Relevant contract evidence exists and satisfies the explicit policy requirement.
-
-### `NON_COMPLIANT`
-
-Relevant evidence exists, but the contractual commitment conflicts with or falls below the policy requirement.
-
-### `AMBIGUOUS`
-
-Potentially relevant language exists, but the wording is vague, incomplete, non-measurable, or open to interpretation.
-
-### `MISSING`
-
-No relevant contractual commitment was found. Missing evidence must not be presented as positive proof.
-
-### `REVIEW_REQUIRED`
-
-The system cannot safely produce another status because evidence is weak, conflicting, low-relevance, malformed, or otherwise uncertain.
-
-## Synthetic Dataset
-
-The active demonstration dataset is stored in:
-
-```text
-synthetic_data/
-|-- synthetic_vendor_contract.pdf
-|-- synthetic_vendor_contract.txt
-`-- expected_findings.json
-```
-
-### Why synthetic data is required
-
-Synthetic data is central to the project, not merely a convenience.
-
-1. **Confidentiality:** Real vendor contracts may include commercial terms, customer information, infrastructure details, and legal obligations.
-2. **Known ground truth:** The expected result for each policy is intentionally designed and recorded.
-3. **Repeatability:** The same contract can be used for extraction, redaction, chunking, retrieval, and classification tests.
-4. **Coverage:** One small agreement demonstrates compliant, non-compliant, ambiguous, missing, and conflicting scenarios.
-5. **Safe PII testing:** Reserved and fictional values can be used to demonstrate redaction without exposing a real person.
-6. **Debugging:** Expected pages and evidence make it easier to identify whether a failure occurs in extraction, redaction, chunking, retrieval, or generation.
-7. **Responsible review:** The demonstration does not imply that a small prototype is ready to process real organizational contracts.
-
-### Dataset design
-
-The six-page synthetic agreement contains:
-
-- Page 1: parties, services, confidentiality, and synthetic PII
-- Page 2: security program, AES-256 encryption, TLS, access control, and vulnerability management
-- Page 3: incident handling and a thirty-calendar-day notification commitment
-- Page 4: data return, deletion, and an undefined “reasonable period” retention clause
-- Page 5: prior subprocessor notice and an urgent no-prior-notice exception
-- Page 6: availability, continuity, recovery objectives, termination, and general terms
-
-Ground truth is stored separately in `expected_findings.json`. Expected labels are not embedded in the contract, preventing answer leakage into retrieval or model analysis.
-
-### Synthetic PII values
-
-The contract includes reserved demonstration values such as:
-
-```text
-Person: Alex Morgan
-Email: alex.morgan@example.test
-Phone: +1 202-555-0147
-IP address: 192.0.2.25
-```
-
-These values are synthetic and exist only to test the redaction pipeline.
+Non-compliant, ambiguous, missing, and review-required findings are forced to human review.
 
 ## Privacy and PII Redaction
 
-Presidio analysis occurs before chunking, embedding, ChromaDB storage, retrieval, and LLM processing.
+Redaction occurs before chunking, embedding, ChromaDB storage, retrieval, and model analysis.
 
 ```text
 Original extracted text
-          |
-          v
+        |
+        v
 Presidio Analyzer
-          |
-          v
+        |
+        v
 Selected entity detections
-          |
-          v
+        |
+        v
 Presidio Anonymizer
-          |
-          v
-Typed replacement placeholders
+        |
+        v
+Typed placeholders
+        |
+        v
+Sanitized chunks only
 ```
 
-Example:
+Typed placeholders preserve sentence structure while removing selected values:
 
 ```text
-Before:
-Contact Alex Morgan at alex.morgan@example.test.
-
-After:
-Contact <PERSON> at <EMAIL_ADDRESS>.
+Before: Contact Alex Morgan at alex.morgan@example.test.
+After:  Contact <PERSON> at <EMAIL_ADDRESS>.
 ```
 
-Typed placeholders preserve sentence structure and meaning better than deleting the values entirely.
+Automated PII detection can produce false positives and false negatives. A production system would require organization-specific recognizers, evaluation, privacy review, and secure retention controls.
 
-### Allow-list approach
-
-Only selected entity types are requested during the demonstration:
-
-```text
-PERSON
-EMAIL_ADDRESS
-PHONE_NUMBER
-IP_ADDRESS
-```
-
-Enabling every available recognizer would add noise and complexity. A custom recognizer supports the reserved `.test` email suffix used by the synthetic dataset.
-
-### Presidio limitation
-
-Automated PII detection can produce false positives and false negatives. A production solution would require organization-specific recognizers, testing, privacy review, retention controls, and additional safeguards. Presidio is one layer in a privacy architecture, not a complete privacy guarantee.
-
-## Embeddings and ChromaDB
+## Embeddings, ChromaDB, and Retrieval
 
 ### Embedding model
-
-The project uses the local Ollama embedding model:
 
 ```text
 granite-embedding:30m
 ```
 
-Expected vector dimension:
+Expected dimension:
 
 ```text
 384
 ```
 
-The same model must be used for document chunks and policy queries.
+The application validates embedding count, numeric values, finite values, and vector dimensions.
 
-### Why ChromaDB
+### ChromaDB storage
 
-ChromaDB is used because the demonstration primarily needs local semantic retrieval over a small collection of sanitized contract chunks. It provides a compact interface for storing and querying:
+ChromaDB stores only sanitized chunks and retrieval metadata:
 
-- IDs;
-- documents;
-- embeddings; and
-- metadata.
-
-PostgreSQL with `pgvector` would be a reasonable production option when the system needs multi-user relational data, complex joins, transactional workflows, central administration, backup, and point-in-time recovery. For this small local project, PostgreSQL would add infrastructure without improving the core demonstration.
-
-### ChromaDB record
-
-A stored chunk is conceptually similar to:
-
-```json
-{
-  "id": "synthetic_vendor_contract-chunk-006",
-  "document": "The Vendor shall encrypt all Customer Data...",
-  "embedding": "384-dimensional vector",
-  "metadata": {
-    "document_id": "synthetic_vendor_contract",
-    "source": "synthetic_vendor_contract.pdf",
-    "page_number": 2,
-    "sanitized": true
-  }
-}
-```
-
-Only sanitized chunks are accepted by the vector-store service.
-
-### Persistence
+- chunk ID;
+- sanitized text;
+- embedding;
+- document ID;
+- source filename;
+- page number; and
+- sanitized flag.
 
 Runtime ChromaDB data is written to:
 
@@ -528,177 +459,203 @@ Runtime ChromaDB data is written to:
 data/chroma/
 ```
 
-This directory is generated locally and excluded from Git.
+This directory is generated locally and excluded from Git. The source repository retains `data/.gitkeep` only when the runtime directory structure needs to be represented.
 
-## Structured Local LLM Analysis
+### Retrieval behavior
 
-The inference stage uses an approved local Ollama instruction model. A practical configuration may use:
+For a selected policy, the application retrieves the top three sanitized chunks. Retrieval rank and distance are displayed for transparency. A top-ranked result is only a candidate evidence passage and does not prove compliance.
 
-```text
-granite4.1:8b
-```
+## Structured Local Model Analysis
 
-A smaller fallback may be configured when system resources require it:
+The application uses a configurable local Ollama instruction model. The current project supports changing the generation model through:
 
 ```text
-granite4.1:3b
+OLLAMA_MODEL
 ```
 
-The exact approved model can be configured through environment variables.
-
-### Model input
-
-The model receives only:
-
-- explicit policy data;
-- sanitized retrieved evidence;
-- page and chunk references;
-- allowed status values; and
-- strict instructions to return JSON.
-
-Contract text is treated as untrusted evidence, not as application instructions. Text inside a contract must not override the system’s analysis rules.
-
-### Structured finding
-
-A finding is expected to contain fields such as:
-
-```json
-{
-  "policy_id": "POL-002",
-  "policy_version": "v1",
-  "policy_requirement": "Vendor must notify within 72 hours.",
-  "status": "NON_COMPLIANT",
-  "severity": "HIGH",
-  "confidence": 0.91,
-  "explanation": "The contract allows a thirty-day notification period.",
-  "retrieved_clause": "The Vendor shall notify the Customer...",
-  "contract_page": 3,
-  "chunk_id": "synthetic_vendor_contract-chunk-009",
-  "retrieval_distance": 0.22,
-  "recommended_remediation": "Require notification within 72 hours or less.",
-  "requires_human_review": true,
-  "embedding_model": "granite-embedding:30m",
-  "inference_model": "configured local model",
-  "prompt_version": "v1"
-}
-```
-
-Values above are illustrative. Actual model output must be validated.
-
-### Validation rules
-
-- Only allowed statuses are accepted.
-- Malformed JSON is rejected or returned as `REVIEW_REQUIRED` through controlled handling.
-- A result cannot be marked compliant without supporting evidence.
-- Missing evidence cannot be presented as proof.
-- Conflicting evidence requires human review.
-- Low-confidence or weakly retrieved evidence requires human review.
-- Policy thresholds come from the policy file, not from model memory.
-
-## Data Storage
-
-The demonstration uses separate storage for separate responsibilities.
-
-### Policy JSON
-
-Stores explicit business requirements and policy versions:
+The embedding model is configured through:
 
 ```text
-policies/sample_policies.json
+OLLAMA_EMBEDDING_MODEL
 ```
 
-### ChromaDB
-
-Stores sanitized chunks, embeddings, and retrieval metadata:
+The shared Ollama client reads:
 
 ```text
-data/chroma/
+OLLAMA_HOST
 ```
 
-### Expected-findings JSON
+Native execution normally uses the local Ollama endpoint. Container deployment can provide a different host address without changing the auditor or embedder code.
 
-Stores synthetic ground truth for manual and automated verification:
+### Model responsibilities
 
-```text
-synthetic_data/expected_findings.json
-```
+The model generates only a constrained finding draft:
 
-### Optional audit-result JSON
+- status;
+- confidence;
+- explanation;
+- selected chunk ID;
+- recommended remediation; and
+- human-review flag.
 
-If enabled, generated results may be saved locally under:
+The application supplies authoritative values for:
 
-```text
-data/audit/
-```
+- policy ID and version;
+- policy requirement;
+- severity;
+- evidence text;
+- page number;
+- chunk ID validation;
+- retrieval distance;
+- embedding model;
+- inference model; and
+- prompt version.
 
-This directory is excluded from Git. A production system might use PostgreSQL for audit runs, findings, policy versions, model versions, reviewer feedback, and workflow state.
+If the model cites a chunk that was not retrieved, the finding is rejected.
+
+### Smaller-model resilience
+
+The complete-audit runner can convert recoverable model-validation errors into conservative `REVIEW_REQUIRED` fallback findings. A fallback finding:
+
+- uses confidence `0.0`;
+- requires human review;
+- preserves the highest-ranked retrieved chunk for inspection; and
+- does not claim that the chunk proves compliance.
+
+This behavior improves batch completion while keeping the limitation visible.
+
+## Complete Audit, Evaluation, and Export
+
+After sanitized chunks are indexed, the application supports two workflows.
+
+### Single-policy evidence review
+
+1. Select a policy.
+2. Retrieve the top three evidence chunks.
+3. Inspect ranks, pages, chunk IDs, text, and distances.
+4. Generate a structured finding for that policy.
+
+### Complete contract audit
+
+1. Attempt every policy in the active 12-policy baseline.
+2. Retrieve evidence independently for each policy.
+3. Generate and validate one finding per policy.
+4. Isolate policy-level failures so one failure does not discard the full run.
+5. Display consolidated status metrics and findings.
+6. Compare generated results with matching synthetic ground truth where available.
+7. Export full JSON and summary CSV reports.
+
+### Evaluation
+
+When the uploaded PDF stem matches an expected-findings file, the evaluator compares:
+
+- generated status against expected status; and
+- generated evidence page against expected pages.
+
+The UI reports status-match and page-match percentages. These metrics are a small synthetic benchmark, not a production accuracy claim.
 
 ## Repository Structure
 
 ```text
 LTM_project_1/
 |-- app/
+|   |-- .streamlit/
+|   |   `-- config.toml
 |   |-- data/
-|   |   `-- mock_findings.py
+|   |   |-- mock_findings.py
+|   |   `-- sample_policies.py
 |   |-- models/
+|   |   |-- audit_run.py
 |   |   |-- chunk.py
 |   |   |-- document.py
+|   |   |-- evaluation.py
 |   |   |-- finding.py
 |   |   |-- policy.py
 |   |   `-- retrieval.py
 |   |-- services/
+|   |   |-- audit_runner.py
 |   |   |-- auditor.py
 |   |   |-- chunker.py
 |   |   |-- document_extractor.py
 |   |   |-- embedder.py
+|   |   |-- evaluator.py
+|   |   |-- ollama_client.py
 |   |   |-- pii_redactor.py
 |   |   |-- policy_loader.py
+|   |   |-- report_exporter.py
 |   |   |-- retriever.py
 |   |   `-- vector_store.py
 |   `-- ui/
 |       `-- main.py
 |-- data/
-|   |-- audit/              # Generated locally, ignored by Git
-|   |-- chroma/             # Generated locally, ignored by Git
-|   |-- sanitized/          # Generated locally, ignored by Git
-|   `-- uploads/            # Generated locally, ignored by Git
+|   `-- .gitkeep              # Optional tracked placeholder
 |-- policies/
 |   `-- sample_policies.json
 |-- prompts/
 |   `-- compliance_audit_v1.txt
 |-- synthetic_data/
-|   |-- expected_findings.json
-|   |-- synthetic_vendor_contract.pdf
-|   `-- synthetic_vendor_contract.txt
+|   |-- README_DATASET.md
+|   |-- cloud_analytics_agreement.pdf
+|   |-- cloud_analytics_agreement.txt
+|   |-- cloud_analytics_agreement_expected_findings.json
+|   |-- customer_support_saas_agreement.pdf
+|   |-- customer_support_saas_agreement.txt
+|   |-- customer_support_saas_agreement_expected_findings.json
+|   |-- managed_it_support_agreement.pdf
+|   |-- managed_it_support_agreement.txt
+|   |-- managed_it_support_agreement_expected_findings.json
+|   |-- synthetic_vendor_contract_v2.pdf
+|   |-- synthetic_vendor_contract_v2.txt
+|   |-- synthetic_vendor_contract_v2_expected_findings.json
+|   `-- synthetic_vendor_services_agreement_7_pages.pdf
 |-- tests/
+|   |-- test_audit_runner.py
 |   |-- test_auditor.py
 |   |-- test_chunker.py
 |   |-- test_document_extractor.py
 |   |-- test_embedder.py
+|   |-- test_evaluator.py
+|   |-- test_finding.py
 |   |-- test_pii_redactor.py
 |   |-- test_policy_loader.py
-|   |-- test_schema.py
+|   |-- test_report_exporter.py
 |   `-- test_vector_store.py
 |-- .env.example
 |-- .gitattributes
 |-- .gitignore
+|-- pytest.ini
+|-- rag_project_master_context_revised.txt
 |-- README.md
-`-- requirements.txt
+|-- requirements.txt
+`-- T9925_VITV_DANIELROBIN.pptx
 ```
 
-Some final-stage files may be added as the local structured-audit integration is completed. Runtime folders and archived development copies are intentionally excluded from source control.
+Generated caches, ChromaDB files, archived datasets, archived policies, and development backup files are intentionally excluded from Git.
+
+### Key active implementation files
+
+```text
+app/models/audit_run.py
+app/models/evaluation.py
+app/services/audit_runner.py
+app/services/auditor.py
+app/services/embedder.py
+app/services/evaluator.py
+app/services/ollama_client.py
+app/services/report_exporter.py
+app/ui/main.py
+policies/sample_policies.json
+prompts/compliance_audit_v1.txt
+```
 
 ## Prerequisites
 
-- Windows VM or compatible local environment
-- CPython 3.12, 64-bit
+- Python 3.12
 - Git
-- Visual Studio Code or another Python editor
-- Ollama runtime
-- Ollama embedding model `granite-embedding:30m`
-- An approved Ollama instruction model
-- spaCy model `en_core_web_lg`
-- Approximately 16 GB RAM recommended for the larger local instruction model
+- Ollama
+- `granite-embedding:30m`
+- An installed local instruction model configured through `OLLAMA_MODEL`
+- spaCy `en_core_web_lg`
 
 ## Installation
 
@@ -709,7 +666,7 @@ git clone https://github.com/dr0b1n/LTM_project_1.git
 cd LTM_project_1
 ```
 
-### 2. Create a virtual environment
+### 2. Create and activate a virtual environment
 
 ```powershell
 python -m venv .venv
@@ -724,135 +681,97 @@ python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-### 4. Verify spaCy
+### 4. Verify the spaCy model
 
 ```powershell
 python -c "import spacy; spacy.load('en_core_web_lg'); print('spaCy model ready')"
 ```
 
-If the model is unavailable and external downloads are approved:
+If the model is unavailable and downloads are permitted:
 
 ```powershell
 python -m spacy download en_core_web_lg
 ```
 
-### 5. Verify Ollama
+### 5. Verify Ollama and models
 
 ```powershell
 ollama --version
 ollama list
 ```
 
-If downloads are approved and the embedding model is missing:
+Pull the embedding model when permitted:
 
 ```powershell
 ollama pull granite-embedding:30m
 ```
 
-Pull the approved instruction model if required:
-
-```powershell
-ollama pull granite4.1:8b
-```
-
-A smaller approved option may be used on constrained systems:
-
-```powershell
-ollama pull granite4.1:3b
-```
-
-### Corporate certificate note
-
-Corporate HTTPS inspection may cause certificate-verification errors during package or model downloads. Do not disable TLS verification and do not use `verify=False` as a workaround. Obtain the approved corporate root/intermediate CA bundle and configure the approved certificate and proxy environment variables.
+Pull the exact instruction-model tag selected for the environment. The application model can be changed without modifying source code by setting `OLLAMA_MODEL`.
 
 ## Configuration
 
-Create a local `.env` from `.env.example`. Never commit `.env`.
+The main runtime variables are:
 
-Example configuration:
-
-```dotenv
-APP_ENV=development
-LOG_LEVEL=INFO
-UPLOAD_DIR=./data/uploads
-SANITIZED_DIR=./data/sanitized
-CHROMA_PATH=./data/chroma
-AUDIT_OUTPUT_DIR=./data/audit
-OLLAMA_HOST=http://127.0.0.1:11434
-OLLAMA_MODEL=granite4.1:8b
-EMBEDDING_MODEL=granite-embedding:30m
-EMBEDDING_DIMENSION=384
-SPACY_MODEL=en_core_web_lg
-MAX_UPLOAD_MB=25
-RETRIEVAL_TOP_K=3
-LLM_TEMPERATURE=0
-PROMPT_VERSION=v1
-POLICY_VERSION=v1
+```text
+OLLAMA_HOST
+OLLAMA_MODEL
+OLLAMA_EMBEDDING_MODEL
 ```
 
-Corporate certificate variables must be configured outside the repository:
+Example native PowerShell configuration:
 
 ```powershell
-$env:SSL_CERT_FILE = "C:\CompanyCertificates\company-ca-bundle.pem"
-$env:REQUESTS_CA_BUNDLE = "C:\CompanyCertificates\company-ca-bundle.pem"
+Remove-Item Env:OLLAMA_HOST -ErrorAction SilentlyContinue
+$env:OLLAMA_MODEL = "granite4:3b"
+$env:OLLAMA_EMBEDDING_MODEL = "granite-embedding:30m"
 ```
 
-Configure proxy variables only with approved values supplied by the organization.
+The default shared Ollama client uses the local Ollama API when `OLLAMA_HOST` is not set.
+
+Keep real secrets or machine-specific values outside Git. `.env.example` may document safe configuration names, but `.env` is ignored.
 
 ## Running the Application
-
-Activate the environment:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-Start Streamlit:
 
 ```powershell
 python -m streamlit run app\ui\main.py
 ```
 
-Open the local URL displayed by Streamlit, commonly:
-
-```text
-http://localhost:8501
-```
+Streamlit prints the local application address in the terminal.
 
 ## Demonstration Guide
 
-Use the bundled synthetic PDF:
+For a broad policy demonstration, use:
 
 ```text
-synthetic_data/synthetic_vendor_contract.pdf
+synthetic_data/cloud_analytics_agreement.pdf
 ```
 
-### Demonstration sequence
+Recommended single-policy examples:
 
-1. Start Ollama and Streamlit.
-2. Upload the synthetic PDF.
-3. Select **Extract PDF Text**.
-4. Show the six-page count and page-level extracted text.
-5. Select **Redact PII and Create Chunks**.
-6. Show Page 1 before and after redaction.
-7. Show detection counts and sanitized chunk metadata.
-8. Select **Index Sanitized Chunks**.
-9. Confirm that embeddings are 384-dimensional and chunks are stored.
-10. Select each policy and retrieve the top three evidence chunks.
-11. Show page numbers, chunk IDs, and vector distances.
-12. Run the structured audit when the local auditor is enabled.
-13. Show status, explanation, evidence, page, remediation, and human-review requirement.
-14. State that the output is illustrative and requires qualified review.
+- `POL-001` — explicit compliant encryption commitment
+- `POL-006` — measurable vulnerability-remediation comparison
+- `POL-007` — incident-notification threshold comparison
+- `POL-009` — ambiguous retention wording
+- `POL-011` — conflicting subprocessor language
 
-### Suggested 5-to-7-minute narrative
+For a faster and clearer smaller-model demonstration, use:
 
-- **Minute 1:** Explain the problem, local-first design, and synthetic dataset.
-- **Minute 2:** Upload and extract the PDF with page metadata.
-- **Minute 3:** Demonstrate Presidio redaction and explain the privacy boundary.
-- **Minute 4:** Create sanitized chunks, embeddings, and the ChromaDB index.
-- **Minute 5:** Retrieve evidence for two or three policies.
-- **Minute 6:** Show structured findings and compare them with expected ground truth.
-- **Minute 7:** Explain limitations, human review, and future production controls.
+```text
+synthetic_data/synthetic_vendor_services_agreement_7_pages.pdf
+```
+
+### Suggested live flow
+
+1. Upload a synthetic PDF.
+2. Extract text and show page metadata.
+3. Run PII redaction and create sanitized chunks.
+4. Show the sanitized preview and chunk metadata.
+5. Index sanitized chunks.
+6. Select one policy and retrieve the top three chunks.
+7. Generate one structured finding.
+8. Run the complete audit.
+9. Show consolidated results, evaluation where available, and exports.
+10. Explain human-review requirements and known limitations.
 
 ## Testing
 
@@ -862,154 +781,82 @@ Run all tests:
 python -m pytest -v
 ```
 
-Run coverage if desired:
+Compile the application and tests:
 
 ```powershell
-python -m pytest --cov=app --cov-report=term-missing
+python -m compileall app tests -q
 ```
 
-Syntax-check the main UI:
-
-```powershell
-python -m py_compile app\ui\main.py
-```
-
-Verify dependency consistency:
+Check installed dependencies:
 
 ```powershell
 python -m pip check
 ```
 
-Optional quality checks:
+The active test suite covers:
 
-```powershell
-ruff check .
-mypy app
-bandit -r app
-pip-audit
-```
+- PDF validation and extraction;
+- PII redaction;
+- chunk construction and metadata;
+- policy JSON loading;
+- embedding validation;
+- ChromaDB storage behavior;
+- structured finding validation;
+- authoritative evidence metadata;
+- invalid JSON and invented chunk handling;
+- complete-audit partial-failure isolation;
+- synthetic evaluation; and
+- JSON and CSV report export.
 
-The small demonstration prioritizes focused functional tests over extensive coverage.
+## Runtime Data and Git
 
-### Tested behavior
-
-Focused tests should verify:
-
-- empty PDF rejection;
-- invalid PDF rejection;
-- textless PDF rejection;
-- page-level extraction;
-- expected PII replacement;
-- empty redaction input;
-- chunk splitting;
-- page and source metadata preservation;
-- policy JSON validation;
-- 384-dimensional embedding validation;
-- sanitized-only ChromaDB storage;
-- finding-schema validation;
-- malformed model-output handling; and
-- evidence requirements for compliant findings.
-
-## Expected Demonstration Outcomes
-
-Ground truth is stored in:
+The following are generated locally and ignored:
 
 ```text
-synthetic_data/expected_findings.json
+data/chroma/
+data/uploads/
+data/sanitized/
+data/audit/
+data/output/
 ```
 
-Typical expected outcomes are:
+They can contain generated indexes, uploaded content, sanitized content, or audit output and should not be committed.
 
-### `POL-001` - Encryption at Rest
+The repository may track:
 
-- Expected status: `COMPLIANT`
-- Expected page: 2
-- Reason: AES-256 or equivalent encryption is explicitly committed.
-
-### `POL-002` - Breach Notification
-
-- Expected status: `NON_COMPLIANT`
-- Expected page: 3
-- Reason: the contract allows thirty calendar days after investigation, while the policy requires notification within 72 hours.
-
-### `POL-003` - Audit Rights
-
-- Expected status: `MISSING`
-- Expected page: none
-- Reason: no operative audit or inspection right exists.
-
-### `POL-004` - Data Retention
-
-- Expected status: `AMBIGUOUS`
-- Expected page: 4
-- Reason: “reasonable period” is not a measurable retention period or objective deletion trigger.
-
-### `POL-005` - Subprocessor Notification
-
-- Expected status: `REVIEW_REQUIRED`
-- Expected page: 5
-- Reason: one clause promises advance notice, while another allows an urgent appointment without prior notice.
-
-Retrieval order may vary slightly. The demonstration does not require the correct clause to rank first if the relevant evidence is present in the top three.
-
-## Security Boundaries
-
-### Enforced demonstration boundaries
-
-- Use synthetic data only.
-- Keep inference and embeddings local through Ollama.
-- Redact selected PII before embeddings and model processing.
-- Store only sanitized chunks in ChromaDB.
-- Preserve evidence separately from generated explanation.
-- Require a page or explicit missing-evidence state.
-- Treat contract text as untrusted data.
-- Keep material findings subject to human review.
-- Keep credentials, certificates, model caches, vector data, uploaded files, and generated reports out of Git.
-
-### Files that must not be committed
-
-- Real vendor contracts
-- Real PII
-- `.env`
-- Credentials or API keys
-- Private keys and certificates
-- `data/chroma/`
-- Uploaded and sanitized runtime files
-- Audit databases and generated reports
-- Local Ollama model data
-- Python virtual environments
-- Archived development copies
-
-Review staged files before every push:
-
-```powershell
-git --no-pager diff --cached --name-only
+```text
+data/.gitkeep
 ```
+
+so the runtime data parent directory exists after cloning.
+
+The following are also ignored:
+
+- Python virtual environments;
+- Python and pytest caches;
+- `.env`;
+- credentials and certificates;
+- archived policies and datasets;
+- backup source copies; and
+- local model files.
 
 ## Known Limitations
 
-- Demonstration rather than production software
-- Synthetic data only
-- PDF input only
+- Synthetic-data demonstration rather than production software
 - Text-based PDFs only
-- No OCR for scanned or image-only PDFs
-- No complex table extraction
-- Basic paragraph or fixed-size chunking
-- Five sample policies
-- One primary synthetic contract
-- No retrieval reranker
-- No formal confidence calibration
-- No large RAG evaluation framework
-- Local-model output may vary
-- Presidio can miss sensitive information
-- No authentication or authorization
-- No multi-user isolation
-- No malware scanning
-- No secure production retention or deletion workflow
-- No production database
-- No high-availability or scaling design
-- No production observability platform
+- No OCR for scanned contracts
+- No robust table or complex-layout extraction
+- Paragraph-based chunking without reranking
+- Local-model output can vary
+- Smaller models may produce more validation fallbacks
+- Synthetic evaluation is not a production accuracy benchmark
+- Presidio can miss sensitive data or produce false positives
+- No authentication, authorization, or multi-user isolation
+- No malware scanning or upload quarantine
+- No secure production document-retention workflow
+- No production relational database
 - No formal legal, privacy, compliance, or security approval
+- No enterprise observability, high availability, or scaling layer
 
 ## Troubleshooting
 
@@ -1021,105 +868,77 @@ Run Streamlit from the repository root:
 python -m streamlit run app\ui\main.py
 ```
 
-Confirm that `app/__init__.py` exists.
-
 ### spaCy model unavailable
 
 ```powershell
 python -c "import spacy; spacy.load('en_core_web_lg'); print('ready')"
 ```
 
-Install the model only through an approved route.
-
-### Ollama is unreachable
+### Ollama unreachable
 
 ```powershell
-ollama --version
 ollama list
-Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags"
+Invoke-RestMethod -Uri "http://localhost:11434/api/tags"
 ```
 
-Restart Ollama or the development terminal if necessary.
+Confirm that `OLLAMA_HOST` is correct for the current environment.
 
-### Embedding model missing
+### Embedding model unavailable
 
 ```powershell
 ollama list
 ollama pull granite-embedding:30m
 ```
 
-The pull command requires approved network access.
-
 ### Wrong embedding dimension
 
 ```powershell
-python -c "import ollama; r=ollama.embed(model='granite-embedding:30m', input=['test']); print(len(r['embeddings'][0]))"
+python -c "from app.services.embedder import embed_texts; v=embed_texts(['test']); print(len(v), len(v[0]))"
 ```
 
 Expected:
 
 ```text
-384
+1 384
 ```
 
-Use the same embedding model for indexing and queries.
+### Stale vector data
 
-### ChromaDB contains stale data
-
-The application replaces chunks for the same document ID when re-indexing. For a clean demonstration reset, stop the application and remove the generated local vector directory:
+Stop the application and remove only the generated ChromaDB directory:
 
 ```powershell
 Remove-Item data\chroma -Recurse -Force
 ```
 
-Then restart the application and index the sanitized chunks again. Never run the command against a directory containing required data.
+Then restart the application and index the contract again.
 
-### Corporate certificate error
+### Pytest import mismatch from archived test copies
 
-Do not disable SSL verification. Obtain the approved CA bundle, approved proxy configuration, or internally mirrored package/model artifact.
-
-### Git opens a screen containing `(END)`
-
-Git is using a pager. Press:
-
-```text
-q
-```
-
-To avoid the pager:
+The repository uses `pytest.ini` to restrict normal collection to the active `tests/` directory. Remove generated caches if necessary:
 
 ```powershell
-git --no-pager diff --cached --stat
+Remove-Item .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue
+Get-ChildItem -Directory -Recurse -Filter __pycache__ | Remove-Item -Recurse -Force
 ```
 
-## Future Production Enhancements
+## Future Enhancements
 
-The following are intentionally excluded from the small demonstration but would be relevant to a production design:
+Potential production improvements include:
 
-- Enterprise authentication, SSO, and role-based access control
-- Multi-user and tenant isolation
-- Malware scanning and upload quarantine
-- File-signature and MIME validation
-- OCR and more robust document-layout processing
-- Organization-specific PII recognizers
-- Secure original-document storage and retention
-- PostgreSQL with `pgvector`
-- Policy approval and version-lifecycle workflows
-- Reviewer feedback and finding disposition
-- Full audit history
-- Prompt and model governance
-- Model digest and artifact tracking
-- Retrieval evaluation and regression datasets
-- Prompt-injection testing
-- Structured logging without raw PII
-- Health checks and metrics
-- Container deployment
-- CI/CD quality and security gates
-- Dependency, model, and container scanning
-- Backup, restoration, deletion, and disaster-recovery procedures
-- Formal legal, privacy, compliance, and security review
-
-These items should be considered future work rather than additions to the demonstration unless explicitly required.
+- authentication, SSO, and role-based access control;
+- multi-user and tenant isolation;
+- malware scanning and upload quarantine;
+- OCR and layout-aware extraction;
+- organization-specific PII recognizers;
+- secure document storage and retention;
+- relational audit history and policy lifecycle management;
+- reviewer feedback and finding disposition;
+- retrieval reranking and larger evaluation datasets;
+- formal prompt and model governance;
+- structured logging without raw contract text;
+- deployment health checks and monitoring;
+- container packaging and CI/CD security gates; and
+- formal legal, privacy, compliance, and security review.
 
 ## Responsible Use
 
@@ -1127,14 +946,15 @@ The application is a review aid. Users remain responsible for:
 
 - verifying retrieved evidence;
 - reading the surrounding contract context;
-- resolving conflicting clauses;
-- checking policy applicability and version;
+- checking policy applicability and policy version;
+- resolving conflicting or incomplete clauses;
 - assessing legal meaning;
+- reviewing fallback findings;
 - approving remediation language; and
 - making the final compliance decision.
 
-A generated explanation must never replace the direct contract evidence. A missing retrieval result must never be treated as conclusive proof without human review.
+A generated explanation must not replace direct contract evidence. A nearest-neighbor retrieval result must not be treated as proof of compliance, and absence of a retrieved clause must not be considered conclusive without human review.
 
 ## License and Distribution
 
-This repository is an educational, synthetic, non-production demonstration. Review the licenses and organizational approvals for all Python packages, local models, and external runtimes before broader distribution or use.
+This repository is an educational, synthetic, non-production demonstration. Review applicable licenses and organizational approvals for Python packages, local models, and external runtimes before broader distribution or use.
