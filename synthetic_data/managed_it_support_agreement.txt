@@ -1,0 +1,79 @@
+Managed IT Support Agreement
+Harborline Support Services and Cedar Works Cooperative
+Effective date: 1 September 2026
+SYNTHETIC AGREEMENT - NOT FOR LEGAL USE
+
+=== PAGE 1 ===
+1. Agreement and Support Services
+
+Harborline provides service-desk support, endpoint administration and remote troubleshooting for Cedar Works. Services cover the systems listed in the customer service schedule.
+Synthetic demonstration contact: Priya Shah, priya.shah@example.test, +1 303-555-0182, and 198.51.100.44.
+NOTE: SYNTHETIC AGREEMENT - NOT FOR LEGAL USE
+
+=== PAGE 2 ===
+2. Customer Responsibilities
+
+The Customer will maintain software licenses, identify authorized contacts and provide timely access to supported systems. Harborline may rely on instructions from listed contacts.
+The Customer remains responsible for approving material production changes and maintaining business-owned backups unless a work order says otherwise.
+- Provide accurate asset inventory.
+- Report suspected incidents promptly.
+- Review monthly service reports.
+
+=== PAGE 3 ===
+3. Personnel and Confidentiality
+
+Harborline personnel will keep Customer confidential information confidential and use it only to provide services. Personnel receive general security awareness training.
+Harborline performs screening where permitted by law and appropriate to the assigned role, but this Agreement does not define minimum screening checks.
+NOTE: Personnel screening is described without a measurable minimum.
+
+=== PAGE 4 ===
+4. Accounts and Remote Administration
+
+Technicians should use named support identities where technically practical. Legacy systems may use a shared support credential held in the team's approved password vault.
+Remote administration uses encrypted support tooling. Multi-factor authentication is enabled for Harborline's central support portal, but the Agreement does not expressly require MFA for every privileged connection to Customer systems.
+- Access is removed when personnel leave the support team.
+- The support manager reviews group membership from time to time.
+
+=== PAGE 5 ===
+5. Security Controls
+
+Harborline will use commercially reasonable administrative and technical measures to protect Customer information during service delivery.
+The Agreement does not state an encryption algorithm for stored support records or a minimum network protocol for all data transfers.
+NOTE: This section intentionally lacks measurable encryption commitments.
+
+=== PAGE 6 ===
+6. Logs and Vulnerability Handling
+
+The support platform records ticket changes and technician sign-in activity. Logs are retained according to Harborline's standard operational schedule.
+Harborline will address security weaknesses in tools it manages in a commercially reasonable period, taking severity and operational impact into account.
+NOTE: Logging and remediation language is intentionally non-measurable.
+
+=== PAGE 7 ===
+7. Incident Handling
+
+Harborline will inform the Customer promptly after Harborline determines that a security event materially affected Customer information.
+The parties will cooperate on containment and recovery. No fixed notification period is stated in this Agreement.
+- Initial facts may be incomplete.
+- The Customer remains responsible for regulatory notifications unless otherwise agreed.
+
+=== PAGE 8 ===
+8. Service Levels and Continuity
+
+Priority-one tickets receive a response target of one hour. This response target does not guarantee service restoration.
+Harborline maintains general continuity procedures for its service desk, but the Agreement does not state an exercise frequency, recovery time objective or recovery point objective.
+NOTE: Ticket response is not the same as a disaster-recovery commitment.
+
+=== PAGE 9 ===
+9. Subcontractors and Locations
+
+Harborline may use subcontractors to provide after-hours support. Harborline remains responsible for their performance and requires confidentiality obligations.
+Harborline may change subcontractors without advance notice. The Agreement does not expressly require equivalent security obligations or specify permitted data-processing countries.
+- Current subcontractor information is available on request.
+
+=== PAGE 10 ===
+10. Termination and Data Handling
+
+Following termination, Harborline will provide available open-ticket records to the Customer on request and remove Customer access from the support portal.
+Harborline will delete Customer information when no longer reasonably needed for business, legal or operational purposes. The Agreement does not define a deletion deadline or a backup-removal period.
+This synthetic agreement is intended only for demonstration and contains no real business information.
+NOTE: Return and deletion commitments are intentionally incomplete.

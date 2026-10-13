@@ -1,20 +1,32 @@
-﻿# Python virtual environments
+﻿# -----------------------------------------------------------------------------
+# Python environments
+# -----------------------------------------------------------------------------
 .venv/
 venv/
 env/
+ENV/
 
-# Python bytecode and caches
+# -----------------------------------------------------------------------------
+# Python bytecode, tests, coverage, and tooling caches
+# -----------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.pytype/
+.pyre/
+.hypothesis/
 .coverage
 .coverage.*
 htmlcov/
+coverage.xml
 
-# Local configuration, secrets, and certificates
+# -----------------------------------------------------------------------------
+# Local configuration, secrets, credentials, and certificates
+# Keep the safe example configuration.
+# -----------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
@@ -22,69 +34,114 @@ htmlcov/
 *.key
 *.p12
 *.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
 
-# IDE and operating-system files
+# -----------------------------------------------------------------------------
+# IDE, editor, and operating-system files
+# -----------------------------------------------------------------------------
 .vscode/
 .idea/
+*.code-workspace
 .DS_Store
 Thumbs.db
 desktop.ini
+*.swp
+*.swo
+*~
 
-# Generated application data
+# -----------------------------------------------------------------------------
+# Generated application and runtime data
+# -----------------------------------------------------------------------------
+data/chroma/
 data/uploads/
 data/sanitized/
-data/chroma/
 data/audit/
+data/output/
+outputs/
 reports/
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
 
+# -----------------------------------------------------------------------------
 # Logs and temporary files
+# -----------------------------------------------------------------------------
 *.log
 *.tmp
 *.temp
 ~$*
 
-# Build and packaging output
+# -----------------------------------------------------------------------------
+# Python build and packaging output
+# -----------------------------------------------------------------------------
 build/
 dist/
 *.egg-info/
+.eggs/
+wheels/
+*.whl
+*.tar.gz
 
-# Local caches and model artifacts
+# -----------------------------------------------------------------------------
+# Local caches and Ollama artifacts
+# -----------------------------------------------------------------------------
 .cache/
 .ollama/
 
-# Superseded files and local working copies
+# -----------------------------------------------------------------------------
+# Archived, superseded, and local working copies
+# -----------------------------------------------------------------------------
 old versions/
 copilot files/
-synthetic_data/archive/
-policies/archive/
 archive/
 backup/
 backups/
+policies/archive/
+synthetic_data/archive/
+
 *_backup.py
 *_old.py
 *_copy.py
+*_session*_backup.py
+*_before_ui_overhaul.py
 
-# Generated session bundles and extraction artifacts
+# -----------------------------------------------------------------------------
+# Generated session bundles, renders, and extraction artifacts
+# -----------------------------------------------------------------------------
 session_*.zip
 session_*_files/
 _extracted.txt
 _v2_extracted.txt
 _renders*/
+*.rendered.pdf
 
-# Local inventory and environment-check files
+# -----------------------------------------------------------------------------
+# Local inventories and environment-check files
+# -----------------------------------------------------------------------------
+project-file-list.txt
+project-tree.txt
 rag_directory_inventory.txt
 rag_root_summary.txt
 package_test.txt
 rag_external_downloads_checklist.txt
 
-# Synthetic dataset allow-list
-synthetic_data/*.pdf
-synthetic_data/*.docx
-synthetic_data/*.txt
-synthetic_data/*.json
-!synthetic_data/synthetic_vendor_contract.pdf
-!synthetic_data/synthetic_vendor_contract.txt
-!synthetic_data/expected_findings.json
+# -----------------------------------------------------------------------------
+# Local Docker image exports and runtime data
+# Keep Dockerfile, compose.yaml, .dockerignore, and setup scripts tracked.
+# -----------------------------------------------------------------------------
+*.tar
+*.tar.zst
+docker-data/
+
+# -----------------------------------------------------------------------------
+# Project-specific note
+# -----------------------------------------------------------------------------
+# Active source code, app/models, tests, prompts, policy JSON, synthetic
+# contracts, Streamlit configuration, README files, Docker configuration,
+# and the final presentation are intentionally tracked.

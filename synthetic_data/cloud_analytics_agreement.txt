@@ -1,0 +1,102 @@
+Cloud Analytics Services Agreement
+Northstar Metrics Ltd. and Ellison Retail Group
+Effective date: 1 September 2026
+SYNTHETIC AGREEMENT - NOT FOR LEGAL USE
+
+=== PAGE 1 ===
+1. Parties, Purpose and Definitions
+
+This Cloud Analytics Services Agreement governs Northstar Metrics Ltd.'s hosted analytics service for Ellison Retail Group. The service receives sales, inventory, support and workforce-planning data supplied by the Customer.
+Customer Data means information uploaded to or generated through the service. Security Incident means a confirmed compromise of Customer Data confidentiality, integrity or availability. Material Subprocessor means a third party that stores Customer Data or performs a security-sensitive processing activity.
+Synthetic demonstration contacts: Alex Morgan, alex.morgan@example.test, +1 202-555-0147, and test address 192.0.2.25. These values are fictional and included only to test redaction.
+NOTE: SYNTHETIC AGREEMENT - NOT FOR LEGAL USE
+
+=== PAGE 2 ===
+2. Service Scope and Processing Instructions
+
+Northstar will process Customer Data only to provide analytics, dashboards, forecasting and contracted support, and only on documented Customer instructions unless law requires otherwise.
+Customer controls source-system configuration and the accuracy of uploaded data. Northstar may use aggregated statistics that cannot reasonably identify the Customer or a person to improve service performance.
+- Processing locations are listed in Schedule 2.
+- Service changes may not materially reduce the contracted security controls.
+- Personnel with Customer Data access are bound by confidentiality obligations.
+
+=== PAGE 3 ===
+3. Security Program and Encryption
+
+Northstar maintains a documented security program appropriate to the service risk. Customer Data is encrypted at rest using AES-256. Encryption keys are managed through a centralized key-management service and production key access is restricted.
+Customer Data transmitted over public or untrusted networks is protected using TLS 1.2 or later. Deprecated protocols are disabled for production service endpoints.
+- Annual security-risk assessment
+- Secure configuration standards
+- Separation of production and test environments
+
+=== PAGE 4 ===
+4. Identity and Privileged Access
+
+Each workforce user receives a unique identity. Access is granted according to job responsibilities and least privilege. Application and infrastructure access is reviewed quarterly, with unnecessary access removed.
+Privileged and remote administrative access requires multi-factor authentication and approval by an authorized service owner. Emergency privileged access is time-limited and reviewed after use.
+- Shared administrator accounts are prohibited except for documented technical service accounts.
+- Terminated-user access is disabled by the end of the termination day.
+
+=== PAGE 5 ===
+5. Logging, Monitoring and Vulnerability Management
+
+Northstar logs authentication, administrative activity, security alerts and significant data-export events. Security logs are monitored by the security operations function and retained for 365 days.
+Critical vulnerabilities in internet-facing production systems are remediated within 20 calendar days. High vulnerabilities are remediated within 45 calendar days. Where remediation is not practical, a documented compensating control and risk acceptance are required.
+NOTE: The remediation deadlines in this section intentionally differ from the policy baseline.
+
+=== PAGE 6 ===
+6. Security Incident Management
+
+Northstar will investigate suspected events without unreasonable delay and take reasonable measures to contain and remediate confirmed Security Incidents.
+Northstar will notify the Customer without undue delay and no later than ten calendar days after confirming that a Security Incident affected Customer Data. Initial notice may be supplemented as investigation continues.
+- Notice will describe known impact and containment actions.
+- Northstar will preserve relevant records and cooperate with reasonable Customer inquiries.
+
+=== PAGE 7 ===
+7. Audit and Independent Assurance
+
+Northstar will provide its current independent security assurance report and a summary of material remediation activity upon written request once per year.
+If the report identifies an unresolved material control concern relevant to the Customer, the Customer may conduct a focused audit with fifteen business days' notice. Audits must occur during business hours, protect other customers' information and avoid unreasonable disruption.
+- The Customer bears its audit costs.
+- Auditors must be independent and bound by confidentiality.
+
+=== PAGE 8 ===
+8. Retention, Return and Deletion
+
+During the service term, online Customer Data is retained for the duration selected in the order form. If the order form does not state a duration, Northstar retains data for a reasonable operational period based on service needs.
+After termination, Northstar will make Customer Data available for export for thirty days and will delete active copies within forty-five days after the export period. Encrypted backup copies expire through a documented ninety-day backup cycle.
+NOTE: The active-copy deletion deadline and backup expiry are measurable; the in-term default retention phrase is intentionally vague.
+
+=== PAGE 9 ===
+9. Subprocessors
+
+Northstar will bind each Material Subprocessor to written confidentiality, security and data-protection obligations no less protective than the relevant obligations in this Agreement.
+Northstar will provide at least thirty days' advance notice before adding or replacing a Material Subprocessor. The Customer may object on reasonable documented security or privacy grounds during that period.
+For an urgent service-restoration event, Northstar may appoint a temporary hosting provider before notice, provided notice is issued within five business days and the temporary provider is removed or regularized promptly.
+NOTE: The urgent exception creates a controlled conflict for review.
+
+=== PAGE 10 ===
+10. Data Location and Transfers
+
+Primary production processing occurs in Canada and Ireland. Support personnel in approved locations may access Customer Data when necessary to resolve incidents or customer requests.
+Northstar will use contractual and technical safeguards for international transfers. The Customer may request the current list of processing locations but the Agreement does not require Customer approval before a support location changes.
+- Transfer assessments are reviewed periodically.
+- Remote support access is logged and subject to privileged-access controls.
+
+=== PAGE 11 ===
+11. Availability and Service Continuity
+
+Northstar targets 99.9 percent monthly production availability, excluding agreed maintenance and Customer-caused outages.
+Northstar maintains documented business continuity and disaster recovery plans and performs an exercise at least annually. The hosted service has an eight-hour recovery time objective and four-hour recovery point objective.
+- The Customer receives an annual exercise summary on request.
+- Material recovery-plan changes are reviewed by service leadership.
+
+=== PAGE 12 ===
+12. Term, Liability and Order of Precedence
+
+The initial term is twelve months and renews under the applicable order form. Either party may terminate for uncured material breach after thirty days' written notice.
+If documents conflict, the Data Protection Schedule controls for processing terms, the Security Schedule controls for technical safeguards, and the main Agreement controls for other matters.
+This synthetic agreement is for software demonstration and evaluation only. It creates no legal obligations and contains no real customer or vendor information.
+- Notices must be in writing.
+- Changes require authorized written agreement.
+- Sections concerning confidentiality, deletion and liability survive as stated.

@@ -1,0 +1,126 @@
+{
+  "document_id": "cloud_analytics_agreement",
+  "policy_set_id": "vendor-compliance-baseline-v2",
+  "expected_findings": [
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-001",
+      "policy_title": "Encryption at Rest",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        3
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-002",
+      "policy_title": "Encryption in Transit",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        3
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-003",
+      "policy_title": "Identity and Access Management",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        4
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-004",
+      "policy_title": "Privileged Access Security",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        4
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-005",
+      "policy_title": "Security Logging and Monitoring",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        5
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-006",
+      "policy_title": "Vulnerability Remediation",
+      "expected_status": "NON_COMPLIANT",
+      "expected_pages": [
+        5
+      ],
+      "requires_human_review": true
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-007",
+      "policy_title": "Security Incident Notification",
+      "expected_status": "NON_COMPLIANT",
+      "expected_pages": [
+        6
+      ],
+      "requires_human_review": true
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-008",
+      "policy_title": "Audit and Assurance Rights",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        7
+      ],
+      "requires_human_review": false
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-009",
+      "policy_title": "Data Retention",
+      "expected_status": "AMBIGUOUS",
+      "expected_pages": [
+        8
+      ],
+      "requires_human_review": true
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-010",
+      "policy_title": "Secure Data Return and Deletion",
+      "expected_status": "NON_COMPLIANT",
+      "expected_pages": [
+        8
+      ],
+      "requires_human_review": true
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-011",
+      "policy_title": "Subprocessor Management",
+      "expected_status": "REVIEW_REQUIRED",
+      "expected_pages": [
+        9
+      ],
+      "requires_human_review": true
+    },
+    {
+      "document_id": "cloud_analytics_agreement",
+      "policy_id": "POL-012",
+      "policy_title": "Service Continuity and Recovery",
+      "expected_status": "COMPLIANT",
+      "expected_pages": [
+        11
+      ],
+      "requires_human_review": false
+    }
+  ]
+}

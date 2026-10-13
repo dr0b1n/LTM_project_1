@@ -1,55 +1,125 @@
 {
-  "policy_set_id": "vendor-baseline-v1",
+  "policy_set_id": "vendor-compliance-baseline-v2",
   "policies": [
     {
       "policy_id": "POL-001",
       "title": "Encryption at Rest",
-      "category": "Information Security",
-      "requirement": "Vendor must encrypt stored customer data using AES-256 or an accepted equivalent.",
+      "category": "Data Security",
+      "requirement": "Vendor must encrypt customer data at rest using AES-256 or an approved equivalent.",
       "severity": "HIGH",
-      "expected_commitment": "An explicit AES-256 or equivalent encryption-at-rest commitment.",
-      "remediation_guidance": "Add an explicit encryption-at-rest commitment using AES-256 or an approved equivalent.",
-      "policy_version": "v1"
+      "expected_commitment": "Explicit AES-256 or approved-equivalent encryption for stored customer data.",
+      "remediation_guidance": "Add an explicit requirement for AES-256 or approved-equivalent encryption at rest.",
+      "policy_version": "v2"
     },
     {
       "policy_id": "POL-002",
-      "title": "Breach Notification",
-      "category": "Incident Management",
-      "requirement": "Vendor must notify the customer of a confirmed security incident within 72 hours.",
+      "title": "Encryption in Transit",
+      "category": "Data Security",
+      "requirement": "Vendor must protect customer data in transit using TLS 1.2 or later.",
       "severity": "HIGH",
-      "expected_commitment": "A notification deadline no longer than 72 hours after confirmation.",
-      "remediation_guidance": "Amend the notification deadline to 72 hours or less after confirmation.",
-      "policy_version": "v1"
+      "expected_commitment": "Explicit TLS 1.2 or later for customer-data transmission.",
+      "remediation_guidance": "Require TLS 1.2 or later for all customer-data transmissions.",
+      "policy_version": "v2"
     },
     {
       "policy_id": "POL-003",
-      "title": "Audit Rights",
-      "category": "Governance",
-      "requirement": "Customer must have contractual rights to audit or inspect the vendor security controls.",
-      "severity": "MEDIUM",
-      "expected_commitment": "An explicit customer audit, inspection, or independent-assurance access right.",
-      "remediation_guidance": "Add a proportionate audit and inspection rights clause.",
-      "policy_version": "v1"
+      "title": "Identity and Access Management",
+      "category": "Access Control",
+      "requirement": "Vendor must use unique user identities, least privilege, and periodic access reviews at least quarterly.",
+      "severity": "HIGH",
+      "expected_commitment": "Unique identities, least privilege, and quarterly or more frequent access reviews.",
+      "remediation_guidance": "Add unique-account, least-privilege, and quarterly access-review obligations.",
+      "policy_version": "v2"
     },
     {
       "policy_id": "POL-004",
-      "title": "Data Retention",
-      "category": "Data Governance",
-      "requirement": "The contract must define a specific retention period or objective deletion trigger after termination.",
-      "severity": "MEDIUM",
-      "expected_commitment": "A measurable retention period or clearly defined deletion event.",
-      "remediation_guidance": "Define a specific retention period and deletion timeline.",
-      "policy_version": "v1"
+      "title": "Privileged Access Security",
+      "category": "Access Control",
+      "requirement": "Privileged and remote administrative access must require multi-factor authentication and be limited to authorized personnel.",
+      "severity": "HIGH",
+      "expected_commitment": "MFA and authorization controls for privileged and remote administration.",
+      "remediation_guidance": "Require MFA and explicit authorization for all privileged and remote administrative access.",
+      "policy_version": "v2"
     },
     {
       "policy_id": "POL-005",
-      "title": "Subprocessor Notification",
-      "category": "Third-Party Management",
-      "requirement": "Vendor must provide prior notice before appointing a new material subprocessor, without an exception that permits appointment before notice.",
+      "title": "Security Logging and Monitoring",
+      "category": "Security Operations",
+      "requirement": "Vendor must log security-relevant events, monitor them, and retain logs for at least 180 days.",
       "severity": "MEDIUM",
-      "expected_commitment": "Prior notification in all material-subprocessor appointment scenarios.",
-      "remediation_guidance": "Remove or narrow the urgent appointment exception and require prompt prior notice or customer approval.",
-      "policy_version": "v1"
+      "expected_commitment": "Security event logging, monitoring, and at least 180 days of retention.",
+      "remediation_guidance": "Add security-event monitoring and a minimum 180-day log-retention commitment.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-006",
+      "title": "Vulnerability Remediation",
+      "category": "Security Operations",
+      "requirement": "Vendor must remediate critical vulnerabilities within 15 calendar days and high vulnerabilities within 30 calendar days.",
+      "severity": "HIGH",
+      "expected_commitment": "Critical remediation within 15 days and high remediation within 30 days.",
+      "remediation_guidance": "Add measurable critical and high vulnerability remediation deadlines.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-007",
+      "title": "Security Incident Notification",
+      "category": "Incident Management",
+      "requirement": "Vendor must notify the customer of a confirmed security incident affecting customer data within 72 hours.",
+      "severity": "CRITICAL",
+      "expected_commitment": "Confirmed incident notification within 72 hours.",
+      "remediation_guidance": "Amend the agreement to require notice within 72 hours of confirmation.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-008",
+      "title": "Audit and Assurance Rights",
+      "category": "Governance",
+      "requirement": "Customer must receive reasonable audit rights or current independent assurance evidence, with direct audit available when material control concerns remain unresolved.",
+      "severity": "HIGH",
+      "expected_commitment": "Independent assurance plus a path to direct audit for unresolved material concerns.",
+      "remediation_guidance": "Add access to current assurance reports and a direct-audit right for unresolved material concerns.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-009",
+      "title": "Data Retention",
+      "category": "Privacy",
+      "requirement": "Vendor must retain customer data only for a defined period or until an objective documented deletion event occurs.",
+      "severity": "HIGH",
+      "expected_commitment": "A measurable duration or objective deletion trigger.",
+      "remediation_guidance": "Replace vague retention wording with a defined duration or objective deletion event.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-010",
+      "title": "Secure Data Return and Deletion",
+      "category": "Privacy",
+      "requirement": "Vendor must return or delete customer data within 45 days after termination and define how backup copies are removed.",
+      "severity": "HIGH",
+      "expected_commitment": "Return or deletion within 45 days and a defined backup-deletion cycle.",
+      "remediation_guidance": "Require deletion or return within 45 days and specify the maximum backup-removal period.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-011",
+      "title": "Subprocessor Management",
+      "category": "Third-Party Risk",
+      "requirement": "Vendor must impose equivalent data-protection obligations on subprocessors and provide at least 30 days advance notice of material subprocessor changes.",
+      "severity": "HIGH",
+      "expected_commitment": "Written flow-down obligations and at least 30 days advance notice.",
+      "remediation_guidance": "Add equivalent written obligations and at least 30 days advance notice for material subprocessor changes.",
+      "policy_version": "v2"
+    },
+    {
+      "policy_id": "POL-012",
+      "title": "Service Continuity and Recovery",
+      "category": "Resilience",
+      "requirement": "Vendor must maintain tested continuity plans with annual exercises, a recovery time objective no greater than 8 hours, and a recovery point objective no greater than 4 hours.",
+      "severity": "HIGH",
+      "expected_commitment": "Annual testing, RTO of 8 hours or less, and RPO of 4 hours or less.",
+      "remediation_guidance": "Add annual continuity testing and measurable RTO and RPO commitments within policy limits.",
+      "policy_version": "v2"
     }
   ]
 }

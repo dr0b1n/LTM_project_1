@@ -64,3 +64,20 @@ Keep the explanation concise and grounded in the contract evidence.
 
 Use the supplied policy remediation guidance when writing the
 recommended remediation.
+
+MANDATORY CHUNK CITATION RULE:
+
+Before returning the JSON object, apply this rule exactly:
+
+- If status is COMPLIANT, NON_COMPLIANT, AMBIGUOUS, or
+  REVIEW_REQUIRED, chunk_id MUST contain exactly one chunk_id copied
+  from retrieved_evidence.
+
+- If status is MISSING, chunk_id MUST be null.
+
+Never return a non-MISSING status with a null or empty chunk_id.
+
+When more than one chunk is relevant, select the single chunk that most
+directly supports the explanation.
+
+Copy the chunk_id exactly. Do not modify, shorten, summarize, or invent it.
