@@ -1,0 +1,1233 @@
+RAG-POWERED VENDOR COMPLIANCE AUDITOR
+COMPLETED PROJECT CONTEXT FOR REPORT WRITING AND FUTURE AI PROMPTS
+
+Document purpose
+This file records the final implemented state of the RAG-Powered Vendor Compliance Auditor. It is intended to support the final report, presentation, demonstration, repository maintenance, and future AI conversations. It supersedes earlier planning assumptions where the completed implementation differs from the original proposal.
+
+IMPORTANT SCOPE STATEMENT
+This project is a small, local, synthetic, non-production demonstration. It proves that document extraction, privacy processing, local embeddings, vector retrieval, structured local-model analysis, validation, evaluation, and reporting can be connected into a working RAG workflow. It is not production software, legal advice, or an autonomous compliance decision system.
+
+Final decisions must remain with a qualified human reviewer. Generated findings may be inaccurate, especially when the smaller local instruction model produces malformed or weak responses. The project therefore preserves retrieved evidence, validates citations, flags uncertain outcomes, and supports human review.
+
+======================================================================
+1. PROJECT IDENTIFICATION
+======================================================================
+
+Project title
+RAG-Powered Vendor Compliance Auditor
+
+Repository name
+LTM_project_1
+
+Repository
+https://github.com/dr0b1n/LTM_project_1
+
+Primary application entry point
+app/ui/main.py
+
+Primary interface
+Streamlit
+
+Operating environment used during development
+- Windows VM
+- PowerShell terminal
+- Visual Studio Code
+- CPython 3.12, 64-bit
+- Local Python virtual environment
+- Local Ollama runtime
+
+Project category
+- Retrieval-Augmented Generation
+- Vendor and third-party risk review
+- Contract evidence retrieval
+- Privacy-aware local AI demonstration
+
+======================================================================
+2. COMPLETED PROJECT SUMMARY
+======================================================================
+
+The completed application reviews synthetic vendor contracts against a version-controlled set of enterprise security, privacy, and operational policy requirements.
+
+The application performs the following end-to-end workflow:
+
+1. Accepts a text-based synthetic PDF through Streamlit.
+2. Validates and extracts page-level text from the PDF.
+3. Detects selected PII using Microsoft Presidio and spaCy.
+4. Replaces selected PII with typed placeholders.
+5. Splits sanitized text into page-aware chunks.
+6. Generates local 384-dimensional embeddings using granite-embedding:30m through Ollama.
+7. Stores sanitized chunks and metadata in a persistent ChromaDB collection.
+8. Embeds each selected policy requirement.
+9. Retrieves the top three relevant sanitized contract chunks.
+10. Sends the policy and retrieved evidence to a local Ollama instruction model.
+11. Validates the model response using Pydantic.
+12. Verifies that non-MISSING findings cite a real retrieved chunk.
+13. Replaces model-supplied provenance with authoritative application metadata.
+14. Displays the policy, evidence, finding, explanation, and remediation in Streamlit.
+15. Runs the full 12-policy baseline as a complete audit.
+16. Compares results with synthetic expected findings when a matching file exists.
+17. Exports complete results as JSON and a summary as CSV.
+
+The completed system goes beyond the original minimum proposal. The original plan suggested three to five policies and one or two contracts. The final project contains a 12-policy baseline, multiple synthetic agreements, complete-audit execution, simple ground-truth evaluation, exports, and a polished Streamlit interface.
+
+======================================================================
+3. PROBLEM STATEMENT
+======================================================================
+
+Vendor contracts may contain commitments relating to encryption, access control, privileged access, security logging, vulnerability remediation, incident notification, audit rights, data retention, data deletion, subprocessors, and service continuity.
+
+Manual review is repetitive and can miss:
+- absent commitments;
+- weaker thresholds;
+- vague language;
+- conflicting clauses;
+- exceptions;
+- commitments placed in unexpected sections; and
+- evidence that does not actually support the policy requirement.
+
+The project addresses this problem by retrieving relevant contract passages for an explicit policy and generating a structured, evidence-backed review finding. The generated explanation does not replace the contract evidence. Retrieval rank alone is not treated as proof of compliance.
+
+======================================================================
+4. FINAL OBJECTIVES AND OUTCOMES
+======================================================================
+
+Objective 1: Build a review-ready contract upload interface
+Outcome: Completed with Streamlit PDF upload, extraction preview, page selection, metrics, workflow stages, and responsible-use notices.
+
+Objective 2: Protect selected sensitive information before AI processing
+Outcome: Completed with Presidio, spaCy, allow-listed PII entities, typed placeholders, and a sanitized-only downstream boundary.
+
+Objective 3: Generate local embeddings and retrieve relevant contract evidence
+Outcome: Completed with granite-embedding:30m, validated 384-dimensional vectors, ChromaDB persistence, and top-three retrieval.
+
+Objective 4: Produce structured evidence-backed compliance findings
+Outcome: Completed with a local Ollama instruction model, a Pydantic response schema, chunk-citation validation, and authoritative metadata replacement.
+
+Objective 5: Review all policies in one run
+Outcome: Completed with a batch audit runner, progress reporting, per-policy isolation, consolidated findings, and fallback handling for recoverable small-model failures.
+
+Objective 6: Evaluate results against known synthetic outcomes
+Outcome: Completed for contracts that have matching expected-findings JSON files. The evaluator reports status match and page match.
+
+Objective 7: Export audit results
+Outcome: Completed with full JSON export and summary CSV export.
+
+Objective 8: Keep the project explainable and demonstrable
+Outcome: Completed with compact Python modules, direct local function calls, a detailed README, focused tests, synthetic contracts, a final presentation, and a visually customized Streamlit UI.
+
+======================================================================
+5. FINAL END-TO-END WORKFLOW
+======================================================================
+
+Synthetic contract PDF
+    -> PDF validation
+    -> Page-level text extraction
+    -> Presidio and spaCy PII detection
+    -> Typed placeholder replacement
+    -> Sanitized pages
+    -> Page-aware chunking
+    -> Local Ollama embeddings
+    -> Persistent ChromaDB storage
+    -> Policy requirement embedding
+    -> Top-three evidence retrieval
+    -> Local Ollama policy/evidence comparison
+    -> Pydantic structured-output validation
+    -> Retrieved chunk citation validation
+    -> Authoritative evidence metadata mapping
+    -> Single-policy finding or complete audit
+    -> Synthetic expected-result comparison where available
+    -> JSON and CSV export
+    -> Human review
+
+Privacy boundary
+Original extracted contract text is processed by the redaction stage before chunking, embedding, ChromaDB storage, retrieval, or local LLM analysis. Only sanitized chunks are intended to cross the RAG processing boundary.
+
+======================================================================
+6. FINAL ARCHITECTURE
+======================================================================
+
+Frontend
+- Streamlit
+- Wide-page review interface
+- Plum, burgundy, muted-gold, warm-white, and charcoal visual system
+- Workflow strip for Document, Privacy, Evidence, and Audit stages
+- Sidebar processing-boundary information
+- Document metrics and previews
+- Single-policy review workspace
+- Complete-audit summary and exports
+
+Application style
+- Direct local Python calls from Streamlit
+- No FastAPI layer in the completed demonstration
+- No background workers
+- No microservices
+- No production authentication system
+
+Document processing
+- pypdf
+- PDF-only primary input
+- Text-based PDFs
+- Page-level metadata
+- Controlled errors for unsupported or unusable files
+
+Privacy processing
+- presidio-analyzer
+- presidio-anonymizer
+- spaCy en_core_web_lg
+- Selected entity allow-list
+- Typed placeholders
+
+Chunking
+- Paragraph-based chunking
+- Long-text splitting
+- Page and source metadata preservation
+- Unique chunk IDs
+
+Embeddings
+- Local Ollama runtime
+- granite-embedding:30m
+- Expected vector size: 384
+- Count, dimension, numeric-value, and finite-value validation
+
+Vector database
+- ChromaDB PersistentClient
+- Local runtime path under data/chroma
+- Sanitized chunks only
+- Document replacement behavior to avoid duplicate indexing for the same document ID
+
+Retrieval
+- Policy requirement encoded with the same embedding model
+- Top three chunks per policy
+- Rank, text, page, chunk ID, and distance displayed
+
+Finding generation
+- Local Ollama instruction model
+- Generation model configured through OLLAMA_MODEL
+- Native or Docker-compatible API location configured through OLLAMA_HOST
+- Low-temperature structured generation
+- Pydantic validation
+
+Audit execution
+- Single-policy workflow
+- Complete 12-policy workflow
+- Per-policy progress
+- Policy-level error isolation
+- Conservative fallback handling in the complete audit
+
+Evaluation
+- Synthetic expected-findings JSON
+- Status comparison
+- Evidence-page comparison
+- Evaluation occurs after generation and is never injected into retrieval or prompts
+
+Reporting
+- Complete audit JSON
+- Findings summary CSV
+
+======================================================================
+7. ACTIVE POLICY BASELINE
+======================================================================
+
+Policy file
+policies/sample_policies.json
+
+Number of active controls
+12
+
+Active controls
+1. POL-001 - Encryption at Rest
+2. POL-002 - Encryption in Transit
+3. POL-003 - Identity and Access Management
+4. POL-004 - Privileged Access Security
+5. POL-005 - Security Logging and Monitoring
+6. POL-006 - Vulnerability Remediation
+7. POL-007 - Security Incident Notification
+8. POL-008 - Audit and Assurance Rights
+9. POL-009 - Data Retention
+10. POL-010 - Secure Data Return and Deletion
+11. POL-011 - Subprocessor Management
+12. POL-012 - Service Continuity and Recovery
+
+Each active policy includes:
+- policy ID;
+- title;
+- category;
+- explicit requirement;
+- severity;
+- expected commitment;
+- remediation guidance; and
+- policy version.
+
+Policies are stored in JSON because they are version-controlled business rules rather than executable model knowledge. The policy, not the local model, defines the required commitment.
+
+======================================================================
+8. SYNTHETIC DATASET - FINAL STATE
+======================================================================
+
+Dataset directory
+synthetic_data/
+
+Dataset purpose
+The project uses only synthetic agreements to avoid exposing real confidential contracts and to provide predictable examples for retrieval and finding evaluation.
+
+A. CLOUD ANALYTICS SERVICES AGREEMENT
+Files:
+- synthetic_data/cloud_analytics_agreement.pdf
+- synthetic_data/cloud_analytics_agreement.txt
+- synthetic_data/cloud_analytics_agreement_expected_findings.json
+
+Role in the project:
+- Primary broad demonstration contract
+- Includes multiple policy scenarios
+- Supports expected-result evaluation
+- Contains explicit commitments, weaker thresholds, ambiguity, and controlled conflicts
+
+B. MANAGED IT SUPPORT AGREEMENT
+Files:
+- synthetic_data/managed_it_support_agreement.pdf
+- synthetic_data/managed_it_support_agreement.txt
+- synthetic_data/managed_it_support_agreement_expected_findings.json
+
+Role in the project:
+- Represents a weaker agreement
+- Useful for MISSING and AMBIGUOUS outcomes
+- Helps demonstrate that semantically nearby text is not automatically compliant evidence
+
+C. CUSTOMER SUPPORT SAAS AGREEMENT
+Files:
+- synthetic_data/customer_support_saas_agreement.pdf
+- synthetic_data/customer_support_saas_agreement.txt
+- synthetic_data/customer_support_saas_agreement_expected_findings.json
+
+Role in the project:
+- Represents a stronger contract
+- Includes clearer security and operational commitments
+- Useful for demonstrating a mostly compliant agreement with selected review points
+- Includes untrusted contract text that must not override the application prompt
+
+D. SYNTHETIC VENDOR CONTRACT V2
+Files:
+- synthetic_data/synthetic_vendor_contract_v2.pdf
+- synthetic_data/synthetic_vendor_contract_v2.txt
+- synthetic_data/synthetic_vendor_contract_v2_expected_findings.json
+
+Role in the project:
+- Earlier expanded synthetic agreement
+- Retained for regression and comparison
+- Covers security, incident, retention, deletion, subprocessors, and continuity
+
+E. SEVEN-PAGE SYNTHETIC VENDOR SERVICES AGREEMENT
+File:
+- synthetic_data/synthetic_vendor_services_agreement_7_pages.pdf
+
+Role in the project:
+- Seven-page text-heavy contract
+- Created after observing that the smaller 3B model failed more often on vague or difficult wording
+- Uses explicit headings, direct obligations, concrete deadlines, repeated key retrieval statements, and fewer vague clauses
+- Designed to improve smaller-model retrieval and structured classification reliability
+
+Key subjects in the seven-page contract:
+- AES-256 encryption at rest
+- TLS 1.2 or TLS 1.3 in transit
+- Multi-factor authentication
+- Quarterly privileged-access reviews
+- 365-day log retention
+- Critical vulnerability remediation within seven days
+- Security incident notification within 24 hours
+- Daily backups
+- Four-hour RPO
+- Eight-hour RTO
+- 99.5 percent monthly availability
+- Thirty-day subprocessor notice
+- Environment separation
+- Data deletion deadlines
+- Audit rights
+- Restrictions on public generative AI use
+
+Current limitation:
+The seven-page PDF does not currently have a matching expected-findings JSON in the known final project state. It can be used for extraction, redaction, indexing, retrieval, finding generation, and complete-audit demonstrations, but automated ground-truth evaluation requires a matching expected-findings file.
+
+Dataset documentation
+- synthetic_data/README_DATASET.md
+
+Archived dataset material
+- synthetic_data/archive/
+
+The archive is intentionally excluded from the final Git repository. Active synthetic files are tracked.
+
+Ground-truth isolation rule
+Expected-findings files are used only after model generation. They must not be embedded, indexed, retrieved, or included in the instruction-model prompt.
+
+======================================================================
+9. DOCUMENT EXTRACTION
+======================================================================
+
+Main module
+app/services/document_extractor.py
+
+Input
+- Text-based PDF
+
+Output
+- document ID;
+- source filename;
+- page count;
+- page number;
+- extracted page text; and
+- aggregate character information.
+
+Implemented validation intent
+- Reject unsupported input
+- Reject empty content
+- Reject encrypted PDFs
+- Reject PDFs with no extractable text
+- Preserve page metadata for evidence citation
+
+Not implemented
+- OCR for scanned PDFs
+- Advanced table extraction
+- Complex layout reconstruction
+- DOCX production workflow
+
+======================================================================
+10. PII REDACTION
+======================================================================
+
+Main module
+app/services/pii_redactor.py
+
+Technology
+- Microsoft Presidio Analyzer
+- Microsoft Presidio Anonymizer
+- spaCy en_core_web_lg
+
+Selected PII categories
+- PERSON
+- EMAIL_ADDRESS
+- PHONE_NUMBER
+- IP_ADDRESS
+
+Additional behavior
+- Custom handling for synthetic .test email addresses
+- Typed placeholders such as <PERSON> and <EMAIL_ADDRESS>
+- Sanitized text remains readable enough for retrieval
+
+Reason for allow-listing
+Using a limited entity set reduces unnecessary redaction and keeps the demonstration understandable. The project does not claim complete PII detection.
+
+Known limitation
+Automated redaction can produce false positives and false negatives. Production use would require organization-specific recognizers, evaluation, privacy approval, and secure data lifecycle controls.
+
+======================================================================
+11. CHUNKING
+======================================================================
+
+Main module
+app/services/chunker.py
+
+Implemented behavior
+- Uses sanitized page text
+- Splits primarily by paragraphs
+- Splits long text when necessary
+- Preserves page number
+- Preserves source filename
+- Preserves document ID
+- Creates unique chunk IDs
+- Marks chunks as sanitized
+
+Reason for simple chunking
+The project prioritizes a clear, working demonstration over sophisticated clause segmentation. Paragraph-based chunking is easy to explain and adequate for the synthetic agreements.
+
+======================================================================
+12. EMBEDDING SERVICE
+======================================================================
+
+Main module
+app/services/embedder.py
+
+Shared Ollama client
+app/services/ollama_client.py
+
+Model
+- granite-embedding:30m
+
+Expected dimension
+- 384
+
+Environment variable
+- OLLAMA_EMBEDDING_MODEL
+
+Validation performed
+- Input must be a sequence of non-empty strings
+- Plain strings are rejected as sequence misuse
+- Model name must be non-empty
+- Embedding response must contain the expected number of vectors
+- Values are converted to numeric floats
+- Every vector must contain 384 values
+- NaN and infinite values are rejected
+- Ollama failures are wrapped in a controlled EmbeddingError
+
+Docker compatibility
+The embedder does not call a fixed localhost module function. It uses get_ollama_client(), which reads OLLAMA_HOST.
+
+======================================================================
+13. OLLAMA CLIENT
+======================================================================
+
+Main module
+app/services/ollama_client.py
+
+Purpose
+- Centralizes the Ollama API host
+- Provides one reusable client
+- Supports native Windows and containerized Streamlit execution
+
+Native default
+- http://localhost:11434
+
+Docker-oriented host
+- http://host.docker.internal:11434
+
+Environment variable
+- OLLAMA_HOST
+
+Additional behavior
+- Adds an HTTP scheme when absent
+- Removes trailing slash
+- Uses a longer timeout suitable for local generation
+- Allows cached-client reset for tests
+
+======================================================================
+14. VECTOR STORE AND RETRIEVAL
+======================================================================
+
+Vector-store module
+app/services/vector_store.py
+
+Retriever module
+app/services/retriever.py
+
+Storage technology
+- ChromaDB PersistentClient
+
+Runtime path
+- data/chroma/
+
+Stored information
+- sanitized chunk text;
+- embedding;
+- chunk ID;
+- document ID;
+- source filename;
+- page number; and
+- sanitized metadata.
+
+Retrieval behavior
+- Embeds the selected policy requirement
+- Uses the same embedding model as document indexing
+- Filters by the active document where applicable
+- Returns the top three chunks
+- Includes retrieval distance
+
+Interpretation rule
+Retrieval identifies potentially relevant evidence. It does not independently determine compliance.
+
+======================================================================
+15. STRUCTURED AUDITOR
+======================================================================
+
+Main module
+app/services/auditor.py
+
+Input
+- Policy object
+- Retrieved evidence list
+- Prompt file
+- Configured local instruction model
+
+Prompt file
+prompts/compliance_audit_v1.txt
+
+Generation-model environment variable
+- OLLAMA_MODEL
+
+Prompt construction
+- System message contains the audit prompt
+- User message contains JSON with authoritative policy data and retrieved evidence
+
+Model-controlled fields
+- status
+- confidence
+- explanation
+- selected chunk ID
+- recommended remediation
+- human-review flag
+
+Application-controlled fields
+- policy ID
+- policy version
+- policy requirement
+- severity
+- retrieved clause text
+- contract page
+- chunk ID validation
+- retrieval distance
+- embedding model
+- inference model
+- prompt version
+
+Structured draft statuses
+- COMPLIANT
+- NON_COMPLIANT
+- AMBIGUOUS
+- MISSING
+- REVIEW_REQUIRED
+
+Validation rules
+- Confidence must be between 0.0 and 1.0
+- Explanation must not be empty
+- Remediation must not be empty
+- Model output must parse as the Pydantic schema
+- Non-MISSING findings must cite a chunk
+- The chunk must exist in the retrieved evidence
+- Invented chunks are rejected
+- MISSING findings contain no selected clause, page, chunk, or distance
+- Material or uncertain statuses force human review
+
+No-evidence behavior
+If retrieval returns no evidence, the auditor returns a MISSING finding without calling the model.
+
+======================================================================
+16. SMALLER-MODEL RELIABILITY HANDLING
+======================================================================
+
+Observed issue
+The smaller 3B model was much faster than the 8B model but produced more malformed or internally inconsistent findings, especially non-MISSING findings without valid chunk citations.
+
+Integrity rule retained
+The project did not weaken the basic evidence-integrity rule. A normal non-MISSING finding must cite a retrieved chunk.
+
+Complete-audit fallback
+The batch audit runner converts recoverable model-generation or validation failures into conservative fallback findings rather than losing the entire policy result.
+
+Fallback behavior with retrieved evidence
+- Status: REVIEW_REQUIRED
+- Confidence: 0.0
+- Highest-ranked retrieved clause displayed for inspection
+- Human review required
+- Explanation states that the model response could not be validated
+- Retrieval rank is not presented as proof of compliance
+
+Fallback behavior without evidence
+- Status: MISSING
+- Confidence: 0.0
+- No cited clause
+- Human review required
+
+Purpose
+This tradeoff improves demonstration completion speed while making uncertainty visible. It improves workflow reliability, not model accuracy.
+
+======================================================================
+17. COMPLETE AUDIT RUNNER
+======================================================================
+
+Main module
+app/services/audit_runner.py
+
+Related model
+app/models/audit_run.py
+
+Implemented behavior
+- Iterates over all 12 policies
+- Reports progress
+- Retrieves evidence for each policy
+- Calls the structured auditor
+- Collects findings
+- Isolates policy-level failures
+- Creates conservative fallback findings for recoverable model errors
+- Records audit-run metadata
+- Preserves model and prompt provenance
+
+Why policy-level isolation matters
+One malformed model response should not discard the results of the remaining policies.
+
+======================================================================
+18. EVALUATION
+======================================================================
+
+Evaluator module
+app/services/evaluator.py
+
+Evaluation model
+app/models/evaluation.py
+
+Ground truth
+Matching synthetic expected-findings JSON files
+
+Evaluation dimensions
+- Status match
+- Evidence-page match
+
+Evaluation boundary
+- Runs after generated findings exist
+- Does not affect retrieval or generation
+- Does not leak expected answers into the prompt
+
+Interpretation
+The evaluation is a small synthetic benchmark for demonstration and debugging. It is not a production accuracy measurement and must not be reported as general model accuracy.
+
+======================================================================
+19. REPORT EXPORT
+======================================================================
+
+Main module
+app/services/report_exporter.py
+
+Implemented exports
+- Complete audit JSON
+- Findings summary CSV
+
+JSON purpose
+Preserves the complete audit-run structure and detailed finding fields.
+
+CSV purpose
+Provides a compact summary suitable for review, filtering, and inclusion in spreadsheet-based reporting.
+
+======================================================================
+20. STREAMLIT USER INTERFACE
+======================================================================
+
+Main file
+app/ui/main.py
+
+Theme file
+app/.streamlit/config.toml
+
+Visual direction
+- Enterprise compliance layout
+- Executive-risk color palette
+- Warm white background
+- Plum and burgundy hero area
+- Muted gold accents
+- Charcoal text
+- Dark plum sidebar
+- Rounded components
+- Pale maroon input and text-area surfaces
+
+Main interface stages
+1. Document
+2. Privacy
+3. Evidence
+4. Audit
+
+Main interface sections
+- Hero and demonstration boundary
+- Processing-boundary sidebar
+- Document processing
+- Extraction preview
+- Privacy processing and sanitization
+- Evidence index
+- Policy to evidence to finding review
+- Complete contract audit and export
+- Executive audit summary
+- Synthetic evaluation
+- Policy library
+- Demonstration fallback
+
+Readability improvements
+Disabled and regular text areas were restyled with higher-contrast text, light maroon backgrounds, rounded corners, and no border to match the interface design language.
+
+======================================================================
+21. FINAL REPOSITORY STRUCTURE
+======================================================================
+
+Important root files
+- README.md
+- requirements.txt
+- pytest.ini
+- .env.example
+- .gitattributes
+- .gitignore
+- rag_project_master_context_revised.txt
+- T9925_VITV_DANIELROBIN.pptx
+
+Application
+- app/data/
+- app/models/
+- app/services/
+- app/ui/
+- app/.streamlit/config.toml
+
+Important models
+- app/models/audit_run.py
+- app/models/chunk.py
+- app/models/document.py
+- app/models/evaluation.py
+- app/models/finding.py
+- app/models/policy.py
+- app/models/retrieval.py
+
+Important services
+- app/services/audit_runner.py
+- app/services/auditor.py
+- app/services/chunker.py
+- app/services/document_extractor.py
+- app/services/embedder.py
+- app/services/evaluator.py
+- app/services/ollama_client.py
+- app/services/pii_redactor.py
+- app/services/policy_loader.py
+- app/services/report_exporter.py
+- app/services/retriever.py
+- app/services/vector_store.py
+
+Active tests
+- tests/test_audit_runner.py
+- tests/test_auditor.py
+- tests/test_chunker.py
+- tests/test_document_extractor.py
+- tests/test_embedder.py
+- tests/test_evaluator.py
+- tests/test_finding.py
+- tests/test_pii_redactor.py
+- tests/test_policy_loader.py
+- tests/test_report_exporter.py
+- tests/test_vector_store.py
+
+Policy and prompt
+- policies/sample_policies.json
+- prompts/compliance_audit_v1.txt
+
+Runtime data parent
+- data/
+
+Generated runtime contents are ignored by Git.
+
+======================================================================
+22. TESTING COMPLETED
+======================================================================
+
+Testing framework
+- pytest
+
+Compilation validation
+- python -m compileall app tests -q
+
+Dependency validation
+- python -m pip check
+
+Focused test coverage includes
+- PDF extraction and validation
+- PII redaction
+- Chunk construction and metadata
+- Policy loading
+- Embedding count and dimension validation
+- Non-finite embedding rejection
+- Configurable Ollama client mocking
+- ChromaDB vector-store behavior
+- Structured finding parsing
+- Authoritative metadata replacement
+- Invalid JSON rejection
+- Invented chunk rejection
+- Complete-audit partial-failure handling
+- Synthetic evaluation
+- JSON export
+- CSV export
+
+Important test migration
+Tests originally patched direct ollama module calls. After introducing the shared Ollama client, embedder and auditor tests were updated to patch get_ollama_client() and use controlled fake clients.
+
+Final auditor-test correction
+AuditFinding severity is represented as a string in the final tested model, so the test checks result.severity == "HIGH" rather than result.severity.value.
+
+======================================================================
+23. CONFIGURATION
+======================================================================
+
+Important environment variables
+- OLLAMA_HOST
+- OLLAMA_MODEL
+- OLLAMA_EMBEDDING_MODEL
+
+Native example
+OLLAMA_HOST is normally absent, causing the client to use http://localhost:11434.
+
+Example model configuration
+- OLLAMA_MODEL=granite4:3b for faster demonstration
+- OLLAMA_EMBEDDING_MODEL=granite-embedding:30m
+
+Larger-model option
+- granite4.1:8b may produce more reliable structured results but is slower on the available environment.
+
+Prompt version
+- v1
+
+======================================================================
+24. LOCAL RUN PROCEDURE
+======================================================================
+
+From the repository root in PowerShell:
+
+1. Activate the Python environment.
+2. Confirm Ollama is running with ollama list.
+3. Set the generation and embedding model environment variables if needed.
+4. Run:
+   python -m streamlit run app\ui\main.py
+
+Recommended live demonstration
+1. Upload a synthetic PDF.
+2. Extract text.
+3. Show page metadata and preview.
+4. Run PII redaction and chunking.
+5. Show the sanitized preview.
+6. Index the sanitized chunks.
+7. Select a policy.
+8. Retrieve the top three chunks.
+9. Generate one finding.
+10. Run the complete audit.
+11. Show the executive summary.
+12. Show evaluation if the contract has expected findings.
+13. Download JSON and CSV results.
+14. Explain the human-review and synthetic-data limitations.
+
+======================================================================
+25. DOCKER DEPLOYMENT STATUS
+======================================================================
+
+Completed code preparation
+- auditor.py uses get_ollama_client()
+- embedder.py uses get_ollama_client()
+- OLLAMA_HOST can point to a host service
+- OLLAMA_MODEL is configurable
+- OLLAMA_EMBEDDING_MODEL is configurable
+
+Recommended deployment design
+- Streamlit, Python packages, Presidio, spaCy, and ChromaDB inside Docker
+- Ollama running natively on the Windows host
+- Container reaches host Ollama through http://host.docker.internal:11434
+
+Reason for native host Ollama
+- Existing native runtime was already tested
+- Simpler local GPU and model behavior
+- Avoids adding another moving part before the project review
+
+Docker files discussed for packaging
+- Dockerfile
+- compose.yaml
+- .dockerignore
+- setup-models.ps1
+- start-app.ps1
+- stop-app.ps1
+- verify-docker.ps1
+- README_DOCKER.md
+
+Important transparency note
+The known final repository state documented in this context confirms Docker-compatible Ollama call changes. It does not independently confirm that every planned Docker packaging file was created, committed, built, and tested. The final report should describe Docker as completed only if those files are present in the submitted repository and the image was successfully run.
+
+======================================================================
+26. GIT AND FINAL REPOSITORY STATE
+======================================================================
+
+Repository branch
+- main
+
+Final Git improvements
+- Comprehensive .gitignore
+- Active source, tests, prompts, policies, synthetic contracts, expected-findings files, README, and presentation tracked
+- Python caches ignored
+- pytest cache ignored
+- ChromaDB runtime files ignored
+- archived policies and synthetic data ignored
+- backup source files ignored
+- secrets and certificates ignored
+
+Runtime data
+The project needs the data directory conceptually, but generated contents must not be committed.
+
+Recommended tracked placeholder
+- data/.gitkeep
+
+Ignored runtime directories
+- data/chroma/
+- data/uploads/
+- data/sanitized/
+- data/audit/
+- data/output/
+
+Reason
+These locations contain generated indexes, uploads, sanitized content, or reports. They can be recreated and may contain sensitive runtime data.
+
+Final README update
+README.md was rewritten to document the 12-policy baseline, active synthetic datasets, final architecture, small-model fallback, evaluation, exports, testing, runtime data, and limitations.
+
+======================================================================
+27. RESULTS FOR THE FINAL REPORT
+======================================================================
+
+Report-safe result statement
+The project successfully demonstrated an end-to-end, local-first RAG workflow for synthetic vendor-contract review. The application extracted page-level contract text, redacted selected PII, generated local embeddings, stored sanitized chunks in ChromaDB, retrieved policy-relevant evidence, generated structured findings with a local Ollama model, validated cited chunks, ran a complete 12-policy audit, evaluated supported synthetic contracts, and exported audit results.
+
+Observable completed results
+- Multiple synthetic vendor contracts can be processed.
+- Relevant sanitized clauses can be retrieved for an explicit policy requirement.
+- Findings preserve evidence text, page number, chunk ID, and retrieval distance.
+- Model-generated provenance is not trusted over application metadata.
+- Invented chunk citations are rejected.
+- The complete audit continues when individual model responses fail.
+- Smaller-model failures can be surfaced as REVIEW_REQUIRED rather than silently treated as compliant.
+- Expected-findings files enable simple status and page comparison.
+- Results can be downloaded as JSON and CSV.
+
+Claims to avoid
+- Do not claim production readiness.
+- Do not claim legal validity.
+- Do not claim general accuracy percentages without measured results.
+- Do not claim perfect PII detection.
+- Do not claim that top-ranked retrieval proves compliance.
+- Do not claim Docker deployment was completed unless the final repository and test evidence confirm it.
+
+Suggested Results slide text
+- Relevant contract clauses were retrieved for each policy requirement.
+- Compliance findings were generated with supporting evidence and page references.
+- Invalid or unsupported model citations were rejected.
+- A complete 12-policy audit produced consolidated review results.
+- Synthetic expected findings enabled status and evidence-page comparison.
+- JSON and CSV audit artifacts were generated for review.
+
+Suggested report interpretation
+The most important outcome is successful technology integration and transparent evidence handling. The project proves the workflow, not autonomous legal or compliance accuracy.
+
+======================================================================
+28. DESIGN DECISIONS AND RATIONALE
+======================================================================
+
+Decision: Local-first processing
+Rationale: Reduces exposure of sensitive contract text and demonstrates private local AI processing.
+
+Decision: Synthetic contracts only
+Rationale: Avoids confidential organizational data and enables known expected outcomes.
+
+Decision: Redact before embedding
+Rationale: Limits selected PII exposure in embeddings, ChromaDB, retrieval, and LLM prompts.
+
+Decision: Explicit policy JSON
+Rationale: Keeps thresholds and requirements outside model memory and makes rules reviewable.
+
+Decision: Same embedding model for documents and queries
+Rationale: Maintains vector-space compatibility.
+
+Decision: Top-three retrieval
+Rationale: Simple, transparent, and adequate for demonstration.
+
+Decision: Pydantic structured output
+Rationale: Converts free-form generation into a constrained application contract.
+
+Decision: Application-authoritative provenance
+Rationale: Prevents the model from inventing evidence text, page numbers, policy metadata, or retrieval distance.
+
+Decision: Chunk citation validation
+Rationale: Ensures non-MISSING findings refer to the retrieved evidence set.
+
+Decision: Conservative batch fallback
+Rationale: Allows a faster 3B model to complete the demonstration while clearly flagging uncertain output.
+
+Decision: Direct Streamlit-to-service calls
+Rationale: Minimizes architecture and keeps the prototype explainable within the limited project scope.
+
+Decision: ChromaDB runtime data excluded from Git
+Rationale: The index is generated, machine-specific, and reproducible from active synthetic source files.
+
+======================================================================
+29. KNOWN LIMITATIONS
+======================================================================
+
+Functional limitations
+- PDF-only primary input
+- Text-based PDFs only
+- No OCR
+- No advanced table extraction
+- No complex layout reconstruction
+- Simple paragraph-based chunking
+- No retrieval reranker
+- No cross-encoder
+- No advanced confidence calibration
+
+Model limitations
+- Local model output can vary
+- Smaller models fail structured-output rules more often
+- Fallback findings improve completion, not accuracy
+- Explanations may be incomplete or incorrect
+- Evidence retrieval may miss the best clause
+
+Privacy limitations
+- PII detection is limited to selected entities
+- Presidio can produce false positives and false negatives
+- No formal privacy impact assessment
+- No production retention or secure deletion workflow
+
+Security limitations
+- No authentication
+- No role-based access control
+- No tenant isolation
+- No malware scanning
+- No upload quarantine
+- No production secrets manager
+- No formal prompt-injection evaluation suite
+
+Operational limitations
+- Local single-machine design
+- No high availability
+- No distributed processing
+- No centralized logging
+- No production monitoring
+- No production database
+- No enterprise deployment validation
+
+Evaluation limitations
+- Small synthetic benchmark
+- Evaluation files do not exist for every active contract
+- Status and page matching do not measure complete legal correctness
+- No production corpus
+- No Ragas evaluation framework in the completed implementation
+
+Governance limitations
+- No legal approval
+- No compliance certification
+- No security certification
+- No model governance approval
+- No production use authorization
+
+======================================================================
+30. FUTURE IMPROVEMENTS
+======================================================================
+
+Potential future enhancements
+- Add OCR and layout-aware extraction
+- Add clause-aware chunking
+- Add metadata filtering and reranking
+- Add expected findings for the seven-page contract
+- Add reviewer disposition and feedback
+- Add a persistent audit-history database
+- Add authentication and role-based access
+- Add secure document lifecycle controls
+- Add prompt-injection-specific tests
+- Add richer retrieval and generation evaluation
+- Add model and prompt comparison dashboards
+- Complete and test Docker packaging
+- Add CI tests, dependency scanning, and container scanning
+- Add production logging without raw contract text
+- Add formal legal, privacy, compliance, and security review
+
+Future work should preserve the central design principle: explicit policy rules and direct evidence remain more important than fluent generation.
+
+======================================================================
+31. REPORT STRUCTURE SUGGESTION
+======================================================================
+
+Chapter 1 - Introduction
+- Vendor contract review problem
+- Need for evidence-backed local AI
+- Project scope and synthetic-data boundary
+
+Chapter 2 - Objectives and Scope
+- Final objectives
+- Non-production scope
+- Human-review requirement
+
+Chapter 3 - Background
+- RAG concept
+- Embeddings
+- Vector databases
+- Local LLMs
+- PII redaction
+- Structured output validation
+
+Chapter 4 - System Design
+- Architecture
+- End-to-end workflow
+- Privacy boundary
+- Policy baseline
+- Finding schema
+
+Chapter 5 - Implementation
+- PDF extraction
+- PII redaction
+- Chunking
+- Embeddings
+- ChromaDB
+- Retrieval
+- Structured auditor
+- Batch runner
+- Evaluation
+- Reporting
+- Streamlit UI
+
+Chapter 6 - Synthetic Dataset
+- Dataset rationale
+- Contract families
+- Expected findings
+- Seven-page small-model-friendly contract
+- Ground-truth isolation
+
+Chapter 7 - Testing and Validation
+- Unit and workflow tests
+- Embedding validation
+- Citation validation
+- Invalid JSON and invented-chunk tests
+- Batch failure isolation
+- Export tests
+
+Chapter 8 - Results
+- Completed workflow
+- Evidence-backed findings
+- Complete 12-policy audit
+- Evaluation outputs
+- JSON and CSV reports
+- Interface screenshots
+
+Chapter 9 - Limitations and Responsible Use
+- Synthetic benchmark
+- Model variability
+- PII limitations
+- Non-production security limitations
+- Human review
+
+Chapter 10 - Future Work and Conclusion
+- Docker completion if applicable
+- OCR, reranking, reviewer feedback, stronger evaluation, and governance
+- Final conclusion focused on successful integration
+
+======================================================================
+32. SHORT PROJECT ABSTRACT
+======================================================================
+
+The RAG-Powered Vendor Compliance Auditor is a local-first demonstration system that reviews synthetic vendor agreements against version-controlled security, privacy, and operational policy requirements. The application extracts page-level PDF text, redacts selected personally identifiable information using Microsoft Presidio and spaCy, splits sanitized content into page-aware chunks, generates local embeddings with granite-embedding:30m, and stores the vectors in ChromaDB. For each policy, the system retrieves the top three relevant evidence chunks and uses a local Ollama instruction model to produce a structured finding. Pydantic validation and chunk-citation checks prevent unsupported evidence references, while application-controlled metadata preserves the authentic clause, page, chunk ID, and retrieval distance. The completed Streamlit application supports single-policy review, a complete 12-policy audit, conservative fallback handling for smaller-model failures, synthetic status and page evaluation, and JSON and CSV export. The project demonstrates successful integration of privacy processing, retrieval, local inference, validation, and human-centered review using only synthetic data. It is a non-production decision-support prototype and does not provide legal advice.
+
+======================================================================
+33. SHORT CONCLUSION
+======================================================================
+
+The completed project shows that a local RAG pipeline can support transparent vendor-contract review without relying on unsupported model claims. The system connects PDF extraction, selected PII redaction, local embeddings, ChromaDB retrieval, structured Ollama analysis, Pydantic validation, complete-audit execution, synthetic evaluation, and reporting in one understandable workflow. The strongest design feature is evidence integrity: findings are tied to retrieved contract chunks, while authoritative page and provenance data come from the application rather than the model. Although the prototype is not production-ready and the smaller model requires conservative fallback handling, the project meets its primary goal of demonstrating a working, privacy-aware, evidence-backed compliance-review workflow.
+
+======================================================================
+34. FUTURE AI ASSISTANT INSTRUCTIONS
+======================================================================
+
+When using this context in a future AI conversation:
+1. Treat the project as completed unless the user explicitly requests a change.
+2. Distinguish confirmed implementation from future recommendations.
+3. Do not reintroduce FastAPI, PostgreSQL, Ragas, authentication, or enterprise infrastructure as if already implemented.
+4. Preserve the shared Ollama client architecture.
+5. Preserve the sanitized-only RAG boundary.
+6. Preserve application-authoritative metadata and chunk-citation validation.
+7. Preserve conservative human-review handling.
+8. Do not claim production accuracy or legal authority.
+9. Use the active 12-policy baseline.
+10. Recognize all active synthetic contract families.
+11. State that the seven-page contract needs expected findings before automated evaluation.
+12. Confirm Docker completion from actual repository files before describing it as deployed.
+13. Prefer concise, readable Python changes over new architecture.
+14. Provide exact destination filenames and PowerShell verification commands for code changes.
+15. Do not use real contracts, credentials, certificates, or confidential organizational data.
+
+END OF COMPLETED PROJECT CONTEXT
